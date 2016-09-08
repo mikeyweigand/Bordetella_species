@@ -9,11 +9,11 @@ Revised: 20160-09-08
 
 ## Project tasks:
 1. Assemble genomes of various species
-	+ *B. bronchiseptica*:
-	+ *B. parapertussis*:
-	+ *B. holmesii*:
-	+ *B. hinzii*:
-	+ *B. avium*:
+	+ *B. bronchiseptica*: 20
+	+ *B. parapertussis*: 16
+	+ *B. holmesii*: 16
+	+ *B. hinzii*: 9
+	+ *B. avium*: 8
 1. Whole-genome alignment within each species.
 	+ Identify rearrangements.
 	+ Evaluate gene loss/gain.
