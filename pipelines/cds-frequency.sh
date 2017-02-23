@@ -14,15 +14,18 @@ done
 #cluster genes by sequence identity using cd-hit
 now=$(date +%Y%m%d);
 log=$(date +%Y%m%d%H%M);
-if [ ! results/cd-hit/$now ];then
+if [ ! -d "results/cd-hit/$now" ];then
 	mkdir results/cd-hit/$now;
 fi
 date > results/cd-hit/$now/$log.log;
+which cdhit-est >> results/cd-hit/$now/$log.log;
+cdhit-est | head -1 >> results/cd-hit/$now/$log.log;
 
 for i in $(ls data/genes/*fna);
 do
 	echo $i;
 	o=$(basename $i fna)out;
+	s=$(seq -s"," 300);
 
 	if [ ! -f results/cd-hit/$now/$o ];then
 		cdhit-est -i $i -d 0 \
@@ -32,6 +35,10 @@ do
 		>> results/cd-hit/$now/$log.log;
 
 		clstr_sort_by < results/cd-hit/$now/$o.clstr > results/cd-hit/$now/$o.clstr.sorted
+
+		./src/cdhit_plot_len1.pl results/cd-hit/$now/$o.clstr $s \
+		1-99999 > results/cd-hit/$now/$o.clstr.hist;
+
 	fi
 
 done
