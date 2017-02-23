@@ -27,10 +27,12 @@ Repeat content (IS481), not functional gene content, determines frequency/extent
 	+ progressiveMauve (sw=16, hmm=0.85)
 	+ Identify rearrangements.
 		+ Yes/no, genes at boundaries, etc.
+		+ Circos plots
 	+ Evaluate gene loss/gain (as within-species variation?)
 1. Functional gene content comparison between species.
 	+ Match orthologs and annotate variable functions (protein seqs).
 1. Repeat content within genomes.
 	+ k-mer frequency distribution (jellyfish)
 	+ ortholog frequency/duplication (cdhit-est)
+	  + match ISE stability among genomes?
 1. Compare methylation motifs between species(?).
