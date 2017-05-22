@@ -26,7 +26,7 @@ do
 
 	if [ -f "$faa" ]; then
 		echo -e "\t" $faa;
-		rsync "$faa" ./data/proteins/;
+		rsync "$faa" ./data/proteins/long-name/;
 	fi
 
 
