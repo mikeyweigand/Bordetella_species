@@ -20,6 +20,18 @@ do
 	fi
 done
 
+echo -e "\nExtracting gene sequences...";
+
+for i in $(ls data/genomes/genbank/*gbk);
+do
+	o=$(basename $i gbk)fna;
+	if [ ! -f data/genes/$o ];then
+		echo $i;
+		gbk2genes.pl -in $i -s > data/genes/$o;
+	fi
+done
+
+
 ##make files of single-copy proteins based on self-blast.
 ident="90";
 qcov="70";
@@ -71,11 +83,11 @@ echo -e "\nRunning pairwise RBM..."
 singles=( data/proteins/single-id$ident-len$qcov/*faa );
 
 today=$(date +%Y%m%d);
-today='20170512';
+#today='20170512';
 if [ ! -d results/RBM/$today ];then
 	mkdir results/RBM/$today;
 fi
-: <<'BLOCK'
+
 
 function runRBM {
 	outname=$(basename $1 | grep -Po "^[\w\.]+single")_v_$(basename $2 | grep -Po "^[\w\.]+single");
@@ -116,7 +128,7 @@ ulimit -n 5120;
 -o results/RBM/$today-core -c 1 -d 1 -p \
 -s data/proteins/%s.faa;
 
-BLOCK
+
 
 ##align ogs, concatenate, and calc phylogeny
 echo -e "\nAligning core og sequences with muscle...\n";
@@ -138,4 +150,21 @@ parallel -j 12 -k runMUSCLE {} ::: ${coreogs[@]};
 ~/enveomics/Scripts/Aln.cat.rb -i '-' results/RBM/$today-aln/*aln > results/RBM/$today-ogs/$today-core.aln;
 ~/enveomics/Scripts/Aln.cat.rb -i '-' -I results/RBM/$today-aln/*aln > results/RBM/$today-ogs/$today-core.variable.aln;
 
+
 #ML phylogeny
+raxmlHPC-PTHREADS -f a -m PROTGAMMAGTR -x 12345 -p 12345 -T 12 -N 100 --silent \
+-n $today-core.variable\
+-s results/RBM/$today-ogs/$today-core.variable.aln \
+-w ~/Documents/Bordetella_species/results/RBM/$today-ogs/
+
+BLOCK
+#bord = read.table("20170522-ogs-bin.var.txt", sep="\t",row.names=1,header=T)
+#bordx = as.matrix(bord)
+#bordcc=seq(1,ncol(bordx),1)
+#heatmap.2(bordx, dendrogram="col",srtCol=45,  adjCol = c(1,1),trace="none",colsep=bordcc,cexCol=0.85,col=c("#F7F7F7","#000000","#CA0020"),breaks=c(-1,-0.5,0.5,1))
+
+#ccolors = c("#984ea3","#337eb8","#984ea3","#ff7f00","#4daf4a","#ff7f00","#f5f5f5","#984ea3","#f5f5f5","#337eb8","#984ea3","#ff7f00","#337eb8","#337eb8","#ff7f00","#337eb8","#4daf4a","#984ea3","#984ea3","#e41a1c","#f5f5f5","#337eb8","#ff7f00","#984ea3","#ff7f00","#ff7f00","#e41a1c","#f5f5f5","#984ea3","#4daf4a","#e41a1c","#984ea3","#4daf4a","#984ea3","#4daf4a","#f5f5f5","#984ea3","#984ea3","#e41a1c","#337eb8","#4daf4a","#337eb8","#ff7f00","#4daf4a","#984ea3","#f5f5f5","#4daf4a","#4daf4a","#f5f5f5","#e41a1c","#337eb8","#984ea3")
+
+#pdf(file="20170522-ogs-bin.var01.pdf", width=8, height=8, pointsize=10)
+#heatmap.2(bordx, dendrogram="col",srtCol=45,  adjCol = c(1,1),trace="none",colsep=bordcc,cexCol=0.85,col=c("#F7F7F7","#000000","#CA0020"),breaks=c(-1,-0.5,0.5,1), ColSideColors=ccolors)
+#dev.off()

@@ -42,3 +42,7 @@ do
 	fi
 
 done
+
+#H567=read.table("H567_CP012334.out.clstr.hist",sep="\t",skip=2,nrows=299)
+#H567[is.na(H567)] <- 0
+#ggplot(H567, aes(x=V1,y=V3)) + theme_bw()+geom_bar(stat="identity")+coord_cartesian(ylim=c(0,15),xlim=c(0,70)) +xlab("copies")+ylab("num genes")+ggtitle("Bsp_H567")

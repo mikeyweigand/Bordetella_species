@@ -1,6 +1,6 @@
 # Bordetella Genomics Project Outline
 ------
-Revised: 2017-01-18
+Revised: 2017-04-05
 ------
 ## Project goals:
 1. Produce reference-quality genome assemblies for various Bordetella species.
@@ -20,9 +20,10 @@ Repeat content (IS481), not functional gene content, determines frequency/extent
 	+ *B. trematum*: 2
 	+ *B. pertussis*: representative subset (n=12?)
 	+ should also include NCBI genomes? (Bb=4, Bpp=2, Bho=2, Ba=1, Bt=1)
-1. kSNP phylogeny
-	+ all and within species
-	+ Compare pairwise SNP distributions within each species.
+1. phylogeny
+	+ mash?
+	+ all: core genome AA alignment (muscle + RAxML)  
+	+ within species: kSNP or Snippy? Compare pairwise SNP distributions within each species   
 1. Whole-genome alignment within each species.
 	+ progressiveMauve (sw=16, hmm=0.85)
 	+ Identify rearrangements.
@@ -31,6 +32,7 @@ Repeat content (IS481), not functional gene content, determines frequency/extent
 	+ Evaluate gene loss/gain (as within-species variation?)
 1. Functional gene content comparison between species.
 	+ Match orthologs and annotate variable functions (protein seqs).
+	+ panOCT vs roary vs BLASTNp+RBM??
 1. Repeat content within genomes.
 	+ k-mer frequency distribution (jellyfish)
 	+ ortholog frequency/duplication (cdhit-est)
