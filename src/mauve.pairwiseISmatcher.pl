@@ -82,13 +82,14 @@ while(my$bb = <BBONE>){
 				my$rtseq1bls='';
 				my$lfseq0bls='';
 				my$lfseq1bls='';
+				my$bflank = 1200;
 				unless(($sbb[1] == $len0) || ($sbb[3] == $len1)){
-					$rtseq0bls = &doBLASTn( $query, $seq0, (abs($sbb[1]) - 1000), (abs($sbb[1]) + 1000) );
-					$rtseq1bls = &doBLASTn( $query, $seq1, (abs($sbb[3]) - 1000), (abs($sbb[3]) + 1000) );
+					$rtseq0bls = &doBLASTn( $query, $seq0, (abs($sbb[1]) - $bflank), (abs($sbb[1]) + $bflank) );
+					$rtseq1bls = &doBLASTn( $query, $seq1, (abs($sbb[3]) - $bflank), (abs($sbb[3]) + $bflank) );
 				}
 				unless(($sbb[0] == 1)){
-					$lfseq0bls = &doBLASTn( $query, $seq0, (abs($sbb[0]) - 1000), (abs($sbb[0]) + 1000) );
-					$lfseq1bls = &doBLASTn( $query, $seq1, (abs($sbb[2]) - 1000), (abs($sbb[2]) + 1000) );
+					$lfseq0bls = &doBLASTn( $query, $seq0, (abs($sbb[0]) - $bflank), (abs($sbb[0]) + $bflank) );
+					$lfseq1bls = &doBLASTn( $query, $seq1, (abs($sbb[2]) - $bflank), (abs($sbb[2]) + $bflank) );
 				}
 				#check for right boundary matches
 				my@bmatch=();
@@ -105,29 +106,33 @@ while(my$bb = <BBONE>){
 							print "\tWARNING: Already found right boundary match:\t".join("\t",($name0,$bmatch[$bm],$matches{$bmatch[$bm]}))."\n";
 						}else{
 							$matches{ $bmatch[$bm] } = $bmatch[$bm+1];
-							print "\tFOUND: Right boundary match:\t".join("\t",($name0,$sbb[1],$bmatch[$bm],$name1,$sbb[3],$bmatch[$bm+1]))."\n";
-						}
-					}
-					#check for left boundary matches
-					if((length$lfseq0bls > 1) && (length$lfseq1bls > 1)){
-						my@lf0bls = split("\n",$lfseq0bls);
-						my@lf1bls = split("\n",$lfseq1bls);
-						@bmatch = &BOUNDRY_MATCH( \@lf0bls, \@lf1bls );
-						for(my$lbm = 0; $lbm < @bmatch-1; $lbm+=2){
-							if($bmatch[$lbm] eq "multi"){
-								print "\tWARNING: Multiple left boundary hits:\t".join("\t",($name0,$sbb[0],$bmatch[$lbm+1]))."\n";
-							}elsif($bmatch[$lbm] eq "none"){
-								print "\tWARNING: No left boundary matches found:\t".join("\t",($name0,$sbb[0],$name1,$sbb[2]))."\n";
-							}elsif( exists$matches{ $bmatch[$lbm] } ){
-								print "\tWARNING: Already found left boundary match:\t".join("\t",($name0,$bmatch[$lbm],$matches{$bmatch[$lbm]}))."\n";
-							}else{
-								$matches{ $bmatch[$lbm] } = $bmatch[$lbm+1];
-								print "\tFOUND: Left boundary match:\t".join("\t",($name0,$sbb[0],$bmatch[$lbm],$name1,$sbb[2],$bmatch[$lbm+1]))."\n";
-							}
+							print "\tFOUND: Right boundary match:\t".join("\t",($name0,$sbb[1],$bmatch[$bm],"||",$name1,$sbb[3],$bmatch[$bm+1]))."\n";
 						}
 					}
 				}
+					#check for left boundary matches
+				if((length$lfseq0bls > 1) && (length$lfseq1bls > 1)){
+					my@lf0bls = split("\n",$lfseq0bls);
+					my@lf1bls = split("\n",$lfseq1bls);
+					@bmatch = &BOUNDRY_MATCH( \@lf0bls, \@lf1bls );
+					#print join("\n",@lf0bls)."\n".join("\n",@lf1bls)."\n";
+					for(my$lbm = 0; $lbm < @bmatch-1; $lbm+=2){
+						if($bmatch[$lbm] eq "multi"){
+							print "\tWARNING: Multiple left boundary hits:\t".join("\t",($name0,$sbb[0],$bmatch[$lbm+1]))."\n";
+						}elsif($bmatch[$lbm] eq "none"){
+							print "\tWARNING: No left boundary matches found:\t".join("\t",($name0,$sbb[0],$name1,$sbb[2]))."\n";
+						}elsif( exists$matches{ $bmatch[$lbm] } ){
+							print "\tWARNING: Already found left boundary match:\t".join("\t",($name0,$bmatch[$lbm],$matches{$bmatch[$lbm]}))."\n";
+						}else{
+							$matches{ $bmatch[$lbm] } = $bmatch[$lbm+1];
+							print "\tFOUND: Left boundary match:\t".join("\t",($name0,$sbb[0],$bmatch[$lbm],$name1,$sbb[2],$bmatch[$lbm+1]))."\n";
+						}
+					}
+				}
+					# print length$lfseq0bls."\t".length$lfseq1bls."\n";
+					# print length$lfseq0bls."\t".length$lfseq1bls."\n";
 			}
+
 
 			# 		if(($rtseq0bls !~ /\n/) && ($rtseq1bls !~ /\n/)){
 			# 			my@r0 = split("\t",$rtseq0bls);
