@@ -118,6 +118,7 @@ close OUT;
 
 unless($q){
 	print "\n$fasta:\n";
+	print "\tQuery: $query\n";
 	print "\tCollapsed loci with neighboring IS-elements: ".scalar(keys%dups)."\n";
 	print "\tOriginal length = ".$seqIN->length."\n";
 	print "\tNew length = ".length($seqOUT)."\n\n";
