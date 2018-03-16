@@ -5,9 +5,20 @@ use Getopt::Long;
 
 &GetOptions(	'in=s' => \my$infile,		#
 		'g=s' => \my$gaps,		#
+		'list=s' => \my$list,
 		'i=s' => \my$inverts);		#
 ($infile) or &HELP_MESSAGE;
 (($gaps or $gaps == 0) and ($inverts or $inverts ==0)) or &HELP_MESSAGE;
+
+my%genomes = ();
+if($list){
+	open LIST, "$list";
+	while(my$l = <LIST>){
+		chomp$l;
+		$genomes{ $l } = 1;
+	}
+}
+
 
 open IN, "$infile";
 while(my$i = <IN>){
@@ -15,9 +26,16 @@ while(my$i = <IN>){
 	my@si=split("\t",$i);
 
 	if(($si[2] == $gaps) && ($si[3] == $inverts)){
-		print $i."\n";
-	}
 
+		if($list){
+			if( exists($genomes{$si[0]}) && exists($genomes{$si[1]}) ){
+	 			print $i."\n";
+			}
+
+		}else{
+			print $i."\n";
+		}
+	}
 }
 
 
@@ -35,7 +53,7 @@ sub HELP_MESSAGE { die "
 	 -i <int>	Number of desired inversions.
 
    [optional]
-
+	 -list <list.txt>	Only consider genomes from this list.
 
    [dependencies]
 
