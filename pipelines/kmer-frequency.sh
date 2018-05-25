@@ -33,6 +33,19 @@ do
 
 done
 
+if [ ! -d "results/jellyfish/$now/hist" ];then
+	mkdir results/jellyfish/$now/hist;
+fi
+
+for i in $(ls B*hist | cut -f1 -d"_" | uniq);
+do
+	n=$(basename $i);
+	Table.merge.pl -i " " results/jellyfish/$now/$n\_*.hist | sort -n > results/jellyfish/$now/hist/$n\-$k\mer.hist;
+
+done
+
+
+
 #ggplot
 #cat Bb_I328-15mer.dump Bhi_F582-15mer.dump Bho_F613-15mer.dump Bp_J021-15mer.dump Bpp_H904-15mer.dump Bsp_H567-15mer.dump Bt_F581-15mer.dump > dump3;
 #dump03 = read.table("dump3");

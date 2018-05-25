@@ -1,12 +1,12 @@
 #!/bin/bash
 #prepare gene fasta files with simplified headers
-for i in $(ls data/genomes/genbank/*gbk);
+for i in $(ls data/subset/genbank/*gbk);
 do
 	echo $i;
 	o=$(basename $i gbk)fna;
 
-	if [ ! -f data/genes/$o ];then
-		gbk2genes.pl -in $i -s > data/genes/$o;
+	if [ ! -f data/subset/genes/$o ];then
+		gbk2genes.pl -in $i -s > data/subset/genes/$o;
 	fi
 
 done
@@ -21,7 +21,7 @@ date > results/cd-hit/$now/$log.log;
 which cdhit-est >> results/cd-hit/$now/$log.log;
 cdhit-est | head -1 >> results/cd-hit/$now/$log.log;
 
-for i in $(ls data/genes/*fna);
+for i in $(ls data/subset/genes/*fna);
 do
 	echo $i;
 	o=$(basename $i fna)out;
@@ -42,6 +42,8 @@ do
 	fi
 
 done
+
+
 
 #H567=read.table("H567_CP012334.out.clstr.hist",sep="\t",skip=2,nrows=299)
 #H567[is.na(H567)] <- 0

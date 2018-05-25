@@ -93,7 +93,7 @@ function runRBM {
 	outname=$(basename $1 | grep -Po "^[\w\.]+single")_v_$(basename $2 | grep -Po "^[\w\.]+single");
 	q=$( echo print $3/100 | perl);
 	if [ ! -f results/RBM/$4/$outname.rbm ];then
-		~/enveomics/Scripts/rbm.rb -t 2 -q -i 40 -f $q -1 $1 -2 $2 > results/RBM/$4/$outname.rbm ;
+		~/enveomics/Scripts/rbm.rb -t 2 -q -i 40 -f $qcov -1 $1 -2 $2 > results/RBM/$4/$outname.rbm ;
 	fi
 }
 export -f runRBM
@@ -156,6 +156,8 @@ raxmlHPC-PTHREADS -f a -m PROTGAMMAGTR -x 12345 -p 12345 -T 12 -N 100 --silent \
 -n $today-core.variable\
 -s results/RBM/$today-ogs/$today-core.variable.aln \
 -w ~/Documents/Bordetella_species/results/RBM/$today-ogs/
+
+
 
 BLOCK
 #bord = read.table("20170522-ogs-bin.var.txt", sep="\t",row.names=1,header=T)
