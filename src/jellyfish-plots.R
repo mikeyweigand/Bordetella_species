@@ -8,7 +8,7 @@ hist.Bb = read.table("./20180222/hist/Bb-15mer.hist", header=T, sep="\t")
 hist.Bb2 <- cbind(hist.Bb, rowMeans(hist.Bb[-1]))
 colnames(hist.Bb2)[dim(hist.Bb2)[2]] = "Mean"
 hist.Bb2.melted <- melt(hist.Bb2, id = "Tag")
-
+head(hist.Bb2.melted)
 (ggplot( data = hist.Bb2.melted, aes(x=Tag, y=value, color = variable))
   + geom_point(size=0.5)
   + geom_line()
@@ -120,9 +120,23 @@ hist.Breps = read.table("./20180222/hist/Reps-15mer.hist", header=T, sep="\t")
 hist.Breps.melted <- melt(hist.Breps, id = "Tag")
 
 (ggplot( data = hist.Breps.melted, aes(x=Tag, y=value, color = variable))
-  + geom_point(size=0.25)
+  #+ geom_point(size=0.25)
   + geom_line()
   + coord_cartesian(ylim=c(0,1500),xlim=c(0,150))
+  + theme_minimal()
+  + theme( legend.position = c(0.55,0.6),
+           legend.background=element_rect(fill="white", size=0.5, color="black"),
+           legend.text=element_text(size=7)
+  )
+  + labs(x="Copy number", y="kmer count" )
 )
+ggsave("./20180222/99.figures/Reps-15mer.pdf", device = 'pdf', width = 8, height = 6, units = 'in', useDingbats=F)
 
+(ggplot( hist.Breps, aes(x=Tag, y=Bpetrii_DSM12804.15mer))
+  + geom_line()
+  + geom_point(size = 0.5)
+  + scale_y_continuous(label=comma,name = "Average Number of 15-mers")
+  + scale_x_continuous(name = "Frequency")
+  + coord_cartesian(ylim=c(0,1500),xlim=c(0,50))
+)
   
