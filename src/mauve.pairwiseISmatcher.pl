@@ -12,6 +12,7 @@ use File::Basename;
 		'name1=s' => \my$name1,
 		'query=s' => \my$query,
 		'min=s' => \my$minblock,
+		'boundary' => \my$onlyboundary,
 		'sum=s' => \my$summ,		# output optional summary table of IS-element counts in each genome
 		'out=s' => \my$out);		# output matrix of matched IS-elements
 
@@ -34,46 +35,48 @@ while(my$bb = <BBONE>){
 		my@sbb = split("\t",$bb);
 
 		unless(($sbb[0] == 0 ) || ($sbb[2] == 0)){	#ignores alignment gaps
-			#blastn search within backbone blocks
-			my$seq0bls = &doBLASTn( $query, $seq0, abs($sbb[0]), abs($sbb[1]) );
-			my$seq1bls = &doBLASTn( $query, $seq1, abs($sbb[2]), abs($sbb[3]) );
-			my@sseq0bls = split("\n",$seq0bls);
-			my@sseq1bls = split("\n",$seq1bls);
+			unless($onlyboundary){
+				#blastn search within backbone blocks
+				my$seq0bls = &doBLASTn( $query, $seq0, abs($sbb[0]), abs($sbb[1]) );
+				my$seq1bls = &doBLASTn( $query, $seq1, abs($sbb[2]), abs($sbb[3]) );
+				my@sseq0bls = split("\n",$seq0bls);
+				my@sseq1bls = split("\n",$seq1bls);
 
-			#store blastn hits from seq0
-			my%seq0=();
-			foreach my$hit0 (@sseq0bls){
-				my@bls0 = split("\t",$hit0);
-				my@rel0 = &REL_COORDS( $sbb[0], $sbb[1], $bls0[-2], $bls0[-1] );
-				#print join("\t",($sbb[0],$sbb[1]))."\t||\t". $hit0."\t||\t".join("-",@rel0)."\n";
-				@{ $seq0{ $bls0[0] }{$rel0[0] } } = ($rel0[1],$rel0[2],$bls0[-2],$bls0[-1]);
-			}
+				#store blastn hits from seq0
+				my%seq0=();
+				foreach my$hit0 (@sseq0bls){
+					my@bls0 = split("\t",$hit0);
+					my@rel0 = &REL_COORDS( $sbb[0], $sbb[1], $bls0[-2], $bls0[-1] );
+					#print join("\t",($sbb[0],$sbb[1]))."\t||\t". $hit0."\t||\t".join("-",@rel0)."\n";
+					@{ $seq0{ $bls0[0] }{$rel0[0] } } = ($rel0[1],$rel0[2],$bls0[-2],$bls0[-1]);
+				}
 
-			#look for matches to blastn hits in seq1
-			foreach my$hit1 (@sseq1bls){
-				my@bls1 = split("\t",$hit1);
-				my@rel1 = &REL_COORDS( $sbb[2], $sbb[3], $bls1[-2], $bls1[-1] );
-				my$match = &FIND_MATCH( \@rel1, \%seq0, $bls1[0]);
-				unless($match == 0){
-					#print $bls1[0]."\t". join("\t",@rel1)."\t||\t".join("\t",($match,$seq0{$bls1[0]}{$match}[0],$seq0{$bls1[0]}{$match}[1])). "\n";
-					my$m0 = $bls1[0]."_".join("-",($seq0{$bls1[0]}{$match}[2],$seq0{$bls1[0]}{$match}[3]));
-					my$m1 = $bls1[0]."_".join("-",( $bls1[-2], $bls1[-1]));
-					$matches{ $m0 } = $m1;
-					delete $seq0{$bls1[0]}{$match};
-				}else{
-					unless($q){print "\tWARNING: no match for ".$name1."_".$bls1[0]."_".join("-",($bls1[-2],$bls1[-1]))."\t".join("-",@rel1)."\n" };
+				#look for matches to blastn hits in seq1
+				foreach my$hit1 (@sseq1bls){
+					my@bls1 = split("\t",$hit1);
+					my@rel1 = &REL_COORDS( $sbb[2], $sbb[3], $bls1[-2], $bls1[-1] );
+					my$match = &FIND_MATCH( \@rel1, \%seq0, $bls1[0]);
+					unless($match == 0){
+						#print $bls1[0]."\t". join("\t",@rel1)."\t||\t".join("\t",($match,$seq0{$bls1[0]}{$match}[0],$seq0{$bls1[0]}{$match}[1])). "\n";
+						my$m0 = $bls1[0]."_".join("-",($seq0{$bls1[0]}{$match}[2],$seq0{$bls1[0]}{$match}[3]));
+						my$m1 = $bls1[0]."_".join("-",( $bls1[-2], $bls1[-1]));
+						$matches{ $m0 } = $m1;
+						delete $seq0{$bls1[0]}{$match};
+					}else{
+						unless($q){print "\tWARNING: no match for ".$name1."_".$bls1[0]."_".join("-",($bls1[-2],$bls1[-1]))."\t".join("-",@rel1)."\n" };
+					}
+				}
+
+				#what's left in the hash of seq0 blastn hits?
+				foreach my$miss (keys%seq0){
+					foreach my$missing (sort{$a <=> $b}(keys$seq0{$miss})){
+						unless($q){
+							print "\tWARNING: no match for $name0\_$miss\_".$seq0{$miss}{$missing}[-2]."-".$seq0{$miss}{$missing}[-1]."\t";
+							print join("-",($missing,$seq0{$miss}{$missing}[0],$seq0{$miss}{$missing}[1] ))."\n";
+					 }
+					}
 				}
 			}
-			#what's left in the hash of seq0 blastn hits?
-			foreach my$miss (keys%seq0){
-				foreach my$missing (sort{$a <=> $b}(keys$seq0{$miss})){
-					unless($q){
-						print "\tWARNING: no match for $name0\_$miss\_".$seq0{$miss}{$missing}[-2]."-".$seq0{$miss}{$missing}[-1]."\t";
-						print join("-",($missing,$seq0{$miss}{$missing}[0],$seq0{$miss}{$missing}[1] ))."\n";
-				 }
-				}
-			}
-
 			#also check near boundaries (+/- 1200bp)
 			unless(($sbb[0] < 1 ) || ($sbb[2] < 1)){
 				my$rtseq0bls='';
@@ -89,26 +92,9 @@ while(my$bb = <BBONE>){
 					$lfseq0bls = &doBLASTn( $query, $seq0, (abs($sbb[0]) - $bflank), (abs($sbb[0]) + $bflank) );
 					$lfseq1bls = &doBLASTn( $query, $seq1, (abs($sbb[2]) - $bflank), (abs($sbb[2]) + $bflank) );
 				}
-				#check for right boundary matches
+
+				#check for left boundary matches
 				my@bmatch=();
-				if((length$rtseq0bls > 1) && (length$rtseq1bls > 1)){
-					my@rt0bls = split("\n",$rtseq0bls);
-					my@rt1bls = split("\n",$rtseq1bls);
-					@bmatch = &BOUNDRY_MATCH( \@rt0bls, \@rt1bls );
-					for(my$bm = 0; $bm < @bmatch-1; $bm+=2){
-						if($bmatch[$bm] eq "multi"){
-							unless($q){print "\tWARNING: Multiple right boundary hits:\t".join("\t",($name0,$sbb[1],$bmatch[$bm+1]))."\n"};
-						}elsif($bmatch[$bm] eq "none"){
-							unless($q){print "\tWARNING: No right boundary matches found:\t".join("\t",($name0,$sbb[1],$name1,$sbb[3]))."\n"};
-						}elsif( exists$matches{ $bmatch[$bm] } ){
-							unless($q){print "\tWARNING: Already found right boundary match:\t".join("\t",($name0,$bmatch[$bm],$matches{$bmatch[$bm]}))."\n"};
-						}else{
-							$matches{ $bmatch[$bm] } = $bmatch[$bm+1];
-							unless($q){print "\tFOUND: Right boundary match:\t".join("\t",($name0,$sbb[1],$bmatch[$bm],"||",$name1,$sbb[3],$bmatch[$bm+1]))."\n"};
-						}
-					}
-				}
-					#check for left boundary matches
 				if((length$lfseq0bls > 1) && (length$lfseq1bls > 1)){
 					my@lf0bls = split("\n",$lfseq0bls);
 					my@lf1bls = split("\n",$lfseq1bls);
@@ -116,17 +102,53 @@ while(my$bb = <BBONE>){
 					#print join("\n",@lf0bls)."\n".join("\n",@lf1bls)."\n";
 					for(my$lbm = 0; $lbm < @bmatch-1; $lbm+=2){
 						if($bmatch[$lbm] eq "multi"){
-							unless($q){print "\tWARNING: Multiple left boundary hits:\t".join("\t",($name0,$sbb[0],$bmatch[$lbm+1]))."\n"};
+							unless($q){print "\tWARNING: Multiple left boundary hits:\t\t".join("\t",($name0,$sbb[0],$bmatch[$lbm+1]))."\n"};
 						}elsif($bmatch[$lbm] eq "none"){
 							unless($q){print "\tWARNING: No left boundary matches found:\t".join("\t",($name0,$sbb[0],$name1,$sbb[2]))."\n"};
 						}elsif( exists$matches{ $bmatch[$lbm] } ){
 							unless($q){print "\tWARNING: Already found left boundary match:\t".join("\t",($name0,$bmatch[$lbm],$matches{$bmatch[$lbm]}))."\n"};
 						}else{
+							if($onlyboundary){
+								print OUT $bb."\t". join("\t",(($name0."_".$bmatch[$lbm]),($name1."_".$bmatch[$lbm+1])))."\n"
+							}
 							$matches{ $bmatch[$lbm] } = $bmatch[$lbm+1];
-							unless($q){print "\tFOUND: Left boundary match:\t".join("\t",($name0,$sbb[0],$bmatch[$lbm],$name1,$sbb[2],$bmatch[$lbm+1]))."\n"};
+							unless($q){print "\tFOUND: Left boundary match:\t\t\t".join("\t",($name0,$sbb[0],$bmatch[$lbm],"||",$name1,$sbb[2],$bmatch[$lbm+1]))."\n"};
 						}
 					}
+				}else{
+					unless(($sbb[0] == 1)){
+						unless($q){print "\tWARNING: No left boundary matches found:\t".join("\t",($name0,$sbb[0],$lfseq0bls,$name1,$sbb[2],$lfseq1bls))."\n"};
+					}
 				}
+
+				#check for right boundary matches
+				if((length$rtseq0bls > 1) && (length$rtseq1bls > 1)){
+					my@rt0bls = split("\n",$rtseq0bls);
+					my@rt1bls = split("\n",$rtseq1bls);
+					@bmatch = &BOUNDRY_MATCH( \@rt0bls, \@rt1bls );
+					for(my$bm = 0; $bm < @bmatch-1; $bm+=2){
+						if($bmatch[$bm] eq "multi"){
+							unless($q){print "\tWARNING: Multiple right boundary hits:\t\t".join("\t",($name0,$sbb[1],$bmatch[$bm+1]))."\n"};
+						}elsif($bmatch[$bm] eq "none"){
+							unless($q){print "\tWARNING: No right boundary matches found:\t".join("\t",($name0,$sbb[1],$name1,$sbb[3]))."\n"};
+						}elsif( exists$matches{ $bmatch[$bm] } ){
+							unless($q){print "\tWARNING: Already found right boundary match:\t".join("\t",($name0,$bmatch[$bm],$matches{$bmatch[$bm]}))."\n"};
+						}else{
+							if($onlyboundary){
+								print OUT $bb."\t".join("\t",(($name0."_".$bmatch[$bm]),($name1."_".$bmatch[$bm+1])))."\n"
+							}
+							$matches{ $bmatch[$bm] } = $bmatch[$bm+1];
+							unless($q){print "\tFOUND: Right boundary match:\t\t\t".join("\t",($name0,$sbb[1],$bmatch[$bm],"||",$name1,$sbb[3],$bmatch[$bm+1]))."\n"};
+						}
+					}
+				}else{
+					unless(($sbb[1] == $len0) || ($sbb[3] == $len1)){
+						unless($q){print "\tWARNING: No right boundary matches found:\t".join("\t",($name0,$sbb[1],$rtseq0bls,$name1,$sbb[3],$rtseq1bls))."\n"};
+					}
+				}
+
+			}elsif($onlyboundary){
+				print OUT $bb."\t-\t-\n";
 			}
 
 		}else{
@@ -136,8 +158,10 @@ while(my$bb = <BBONE>){
 }
 #output matches
 unless($q){ print "\tIdentified matches = ". scalar(keys%matches)."\n\n" };
-foreach my$o (sort(keys%matches)){
-	print OUT $name0."_".$o."\t".$name1."_".$matches{$o}."\n";
+unless($onlyboundary){
+	foreach my$o (sort(keys%matches)){
+		print OUT $name0."_".$o."\t".$name1."_".$matches{$o}."\n";
+	}
 }
 close BBONE;
 close OUT;
@@ -284,5 +308,6 @@ sub HELP_MESSAGE { die "
    -q				Run quietly.
    -h				This helpful message.
    -min		<int>		Minimum block size to consider. (NOT AVAILABLE)
+	 -boundary	Only match IS-element insertions located at rearrangement boundaries.
 
 " }
