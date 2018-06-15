@@ -40,14 +40,18 @@ foreach my$s1 (@blastout){
 	my@inv = &INVDIS($term, $seqlen, $center, $ori);
 	@{$bls_hits{ $center }} = (@bls2,@inv);
 	push(@centers,$center);
-	#print join("--",(@bls2,$center))."\t".join("--", @inv)."\n";
+	#print join("__",(@bls2,$center))."\t".join("__", @inv)."\n";
 
 }
 
 # temp file for RScript
 open TEMP, ">$temp";
 foreach my$pos (@centers){
-	print TEMP $pos."\t". join("\t",(  @{$bls_hits{$pos}} ))."\n";
+	my@short = @{$bls_hits{$pos}};
+	splice(@short,2,1); #removes qseqid
+	#print TEMP $pos."\t". join("\t",(  @{$bls_hits{$pos}} ))."\n";
+	print TEMP $pos."\t". join("\t",( @short ))."\n";
+
 }
 close TEMP;
 
@@ -74,14 +78,17 @@ while(my$p = <PRED>){
 
 	foreach my$j (@pred){
 		unless( exists( $matched{$sp[0]}{$j}) ){
-			print OUT join("\t",( $sp[0],$sp[1],$sp[2],$sp[3]))."\t";
-			print OUT join("\t",( $j, $bls_hits{$j}[0],$bls_hits{$j}[1],$bls_hits{$j}[2] ))."\t";
-			print OUT join("\t",( $bls_hits{$sp[0]}[-2], $bls_hits{$j}[-2] ))."\n";
 
-			$matched{$sp[0]}{$j} = 1;
-			$matched{$j}{$sp[0]} = 1;
-			$count++;
+			if($bls_hits{$j}[2] eq $bls_hits{$sp[0]}[2]){	#must have matching qseqids
+				print OUT $bls_hits{$j}[2]."\t";
+				print OUT join("\t",( $sp[0],$sp[1],$sp[2],$sp[3]))."\t";
+				print OUT join("\t",( $j, $bls_hits{$j}[0],$bls_hits{$j}[1],$bls_hits{$j}[3] ))."\t";
+				print OUT join("\t",( $bls_hits{$sp[0]}[-2], $bls_hits{$j}[-2] ))."\n";
 
+				$matched{$sp[0]}{$j} = 1;
+				$matched{$j}{$sp[0]} = 1;
+				$count++;
+			}
 		}
 	}
 }
@@ -126,7 +133,7 @@ sub OFFSET {
 }
 
 sub BLASTN {
-	my$bls = qx( blastn -query $_[0] -subject $_[1] -outfmt '6 sstart send' -qcov_hsp_perc 80 | sort -n );
+	my$bls = qx( blastn -query $_[0] -subject $_[1] -outfmt '6 sstart send qseqid' -qcov_hsp_perc 80 | sort -n );
 	chomp$bls;
 	return($bls);
 }
@@ -185,8 +192,9 @@ sub MATCHER {
 
 	my@found=();
 	foreach my$c (@centers){
+		#my$qseqid = $bls_hits{ $c }[2];
 		if($window[0] < $c && $c < $window[1]){
-			unless( $dir == $bls_hits{ $c }[2]){
+			unless( $dir == $bls_hits{ $c }[3]){	#strand
 				push(@found,$c);
 			}
 		}
