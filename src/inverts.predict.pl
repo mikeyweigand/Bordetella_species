@@ -16,7 +16,7 @@ use Statistics::R;
 my$seqlen = qx( FastA.length.pl $infile | cut -f2);
 chomp$seqlen;
 my$term = &FIND_TERM( $infile );
-#print $term."\t".$seqlen."\n";
+
 my$ori=1;
 if($oric){
 	$ori = &FIND_ORIC( $oric, $infile );
@@ -27,7 +27,6 @@ if($oric){
 #find blastn hits for query in subject and find shortest dist to ori/term
 my$bls = &BLASTN( $query, $infile );
 my@blastout = split("\n",$bls);
-
 
 my%bls_hits = ();
 my@centers = ();
@@ -45,8 +44,6 @@ foreach my$s1 (@blastout){
 
 }
 
-#print @centers."\n";
-
 # temp file for RScript
 open TEMP, ">$temp";
 foreach my$pos (@centers){
@@ -57,8 +54,6 @@ close TEMP;
 # linear regression of observed inverts and predict new boundaries
 my$temp2 = $temp;
 $temp2 =~ s/\.txt$/\-pred.txt/;
-#print $temp2."\n";
-
 system( qq( Rscript /home/yrh8/Documents/Bordetella_species/src/inverts.pred.R -r $inverts -f $temp -o $temp2 ) );
 
 
@@ -66,6 +61,7 @@ system( qq( Rscript /home/yrh8/Documents/Bordetella_species/src/inverts.pred.R -
 open PRED, "$temp2";
 open OUT, ">$out";
 my%matched = ();
+my$count = 0;
 while(my$p = <PRED>){
 	chomp$p;
 	my@sp = split("\t",$p);
@@ -74,9 +70,9 @@ while(my$p = <PRED>){
 	my@pred=();
 	@pred = &MATCHER( \@sp, \@centers, \@window, \%bls_hits);
 
-	#print join("\t",(@sp,@window))."\t".@pred."\n";
-	foreach my$j (@pred){
+	#print $sp[0]."\t".scalar(@pred)."\n";
 
+	foreach my$j (@pred){
 		unless( exists( $matched{$sp[0]}{$j}) ){
 			print OUT join("\t",( $sp[0],$sp[1],$sp[2],$sp[3]))."\t";
 			print OUT join("\t",( $j, $bls_hits{$j}[0],$bls_hits{$j}[1],$bls_hits{$j}[2] ))."\t";
@@ -84,10 +80,13 @@ while(my$p = <PRED>){
 
 			$matched{$sp[0]}{$j} = 1;
 			$matched{$j}{$sp[0]} = 1;
+			$count++;
 
 		}
 	}
 }
+print $count."\n";
+
 
 
 ######################################
@@ -116,12 +115,14 @@ sub INVDIS {
 sub OFFSET {
 	my($seqlen, $ori) = @_;
 	my$offset=0;
-	if( ($seqlen - $ori) < $ori ){ #left of 1
-		$offset = ($seqlen - $ori) * -1;
-	}else{
-		$offset = $ori;
+	unless($ori == 1){
+		if( ($seqlen - $ori) < $ori ){ #left of 1
+			$offset = ($seqlen - $ori) * -1;
+		}else{
+			$offset = $ori;
+		}
 	}
-
+	return($offset);
 }
 
 sub BLASTN {
@@ -134,12 +135,13 @@ sub WINDOW {
 	my@sp = @{$_[0]};
 	my$term = $_[1];
 	my$seqlen = $_[2];
-	my$offset = &OFFSET( $_[2], $_[3]);
-	my@coords = ('1',$_[2]);
+	my$ori = $_[3];
+	my$offset = &OFFSET( $seqlen, $ori );
+	my@coords = ('1',$seqlen);
 
 	if($sp[5] eq 'RtOri'){
 		if($sp[7] < 0){
-			$coords[1] = $seqlen;
+			$coords[1] = $seqlen; # + $offset;
 		}else{
 			$coords[1] = $seqlen + $offset - $sp[7];
 		}
@@ -212,7 +214,7 @@ sub HELP_MESSAGE { die "
 .Description:
    Predict all possible symmetric inversions in given genome based on table of observed inversions.
 
-.Usage: $0 -in [in.txt] -t [int] > out.txt
+.Usage: $0 -fasta [in.fasta] -query [query.fasta] -inverts [inv.txt] -out [out.txt] -temp [temp.txt]
 
    [mandatory]
 	 -fasta	<in.fasta>	Input genome (single contig only).

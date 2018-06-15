@@ -1,5 +1,5 @@
 #!/usr/bin/R Rscript
-library("optparse")
+library(optparse)
 library(ggplot2)
 library(scales)
 
@@ -20,8 +20,9 @@ if (is.null(opt$ref) | is.null(opt$file)){
 }
 
 ## For testing:
-#opt$ref = ("/home/yrh8/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/20180425-Bp-check-gap1500-cat.NR.invertALL.txt")
-#opt$file = ("/home/yrh8/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/invert-predict/tmp-centers.txt")
+# opt$ref = ("/home/yrh8/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/20180614-Bp-check-gap1500-cat.NR.invertALL.txt")
+# opt$file = ("/home/yrh8/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/invert-predict/tmp-centers.txt")
+# wtf.matches = ("/home/yrh8/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/invert-predict/wtf.txt")
 
 ### Set of observed single inversions for model building ###
 refs.df <- read.table(opt$ref,header=F,sep="\t")
@@ -31,8 +32,9 @@ refs.ratio = cbind(refs.symmetric, ratio)
 
 # remove outliers based on Left:Right ratio
 refs.passed = refs.ratio[!refs.ratio$ratio %in% boxplot.stats(refs.ratio$ratio)$out,]
+#nrow(refs.passed)
 
-# duplicate and flip all pairs to balance ratios
+# duplicate and flip all PASSED pairs to balance ratios
 just.lens = refs.passed[,c('V9','V10')]
 just.lens[] <- lapply(just.lens, function(x) {
   if(is.factor(x)) as.numeric(as.character(x)) else x
@@ -64,12 +66,18 @@ write.table(IS481.df, file=opt$out,quote=F,sep="\t",row.names=F,col.names=F)
 # new.df = cbind(new.test, new.pred)
 # break1 = c(0, 250,500,750,1000,1250,1500)
 # 
+# wtf.df <- read.table(wtf.matches,header=F,sep="\t")
+# sapply(wtf.df, class)
+# 
+# 
 # (ggplot()
+#   + geom_point(data=wtf.df, mapping=aes(x=V9/1000,y=V10/1000), size =0.5, color="gray", alpha=0.7)
+# 
 #   + geom_point(data=refs.symmetric, aes(x=as.numeric(as.character(V9))/1000,
 #                                       y=as.numeric(as.character(V10))/1000,
 #                                       color=V11), size=2.2, alpha=0.6)
 #   + geom_smooth(method=lm, data=comb.lens,aes(x=V9/1000, y=V10/1000))
-#   + geom_point(data=comb.lens, mapping = aes(x=V9/1000,y=V10/1000), size=0.5)
+#   + geom_point(data=flip.lens, mapping = aes(x=V9/1000,y=V10/1000), size=2.2, shape=1)
 #   #+ theme_classic()
 #   + theme_minimal()
 #   + theme( legend.position = c(0.79,0.3),
@@ -81,6 +89,8 @@ write.table(IS481.df, file=opt$out,quote=F,sep="\t",row.names=F,col.names=F)
 #   + geom_abline(aes(intercept=0,slope=1),lty=2, size=0.4)
 #   + geom_line(data = new.df, mapping = aes(x=V9/1000, y=lwr/1000),color="red",linetype='dashed')
 #   + geom_line(data = new.df, mapping = aes(x=V9/1000, y=upr/1000),color="red",linetype='dashed')
+# 
+# 
 # )
 
 
