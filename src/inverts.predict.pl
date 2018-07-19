@@ -2,7 +2,7 @@
 use strict;
 use Getopt::Long;
 use Statistics::R;
-
+use File::Basename;
 
 &GetOptions(	'fasta=s' => \my$infile,		#
 		'query=s' => \my$query,
@@ -92,7 +92,7 @@ while(my$p = <PRED>){
 		}
 	}
 }
-print $count."\n";
+print "\n\tFound $count possible inversions between BLASTn hits of '".basename($query)."' in '".basename($infile)."'\n\n";
 
 
 
@@ -225,14 +225,14 @@ sub HELP_MESSAGE { die "
 .Usage: $0 -fasta [in.fasta] -query [query.fasta] -inverts [inv.txt] -out [out.txt] -temp [temp.txt]
 
    [mandatory]
-	 -fasta	<in.fasta>	Input genome (single contig only).
-	 -query	<q.fasta>		Query sequence for predicting inversion boundaries.
+	 -fasta		<in.fasta>	Input genome (single contig only).
+	 -query		<q.fasta>	Query sequence for predicting inversion boundaries.
 	 -inverts	<inv.txt>	Table of observed inversions for modeling, probably output from 'mauve.invert-symmetric.pl'.
-	 -out	<out.txt>		Output table of predicted inversion boundaries.
-	 -temp	<tmp.txt	Temp file to store coordiates for RScript.
+	 -out		<out.txt>	Output table of predicted inversion boundaries.
+	 -temp		<tmp.txt	Temp file to store coordiates for RScript.
 
    [optional]
-	 -oric	<ori.fasta>	Fasta file of known OriC to find coordinates, otherwise use 1.
+	 -oric		<ori.fasta>	Fasta file of known OriC to find coordinates, otherwise use 1.
 
    [dependencies]
 	 inverts.pred.R
