@@ -20,9 +20,9 @@ if (is.null(opt$ref) | is.null(opt$file)){
 }
 
 ## For testing:
-#opt$ref = ("/home/yrh8/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/20180614-Bp-check-gap1500-cat.NR.invertALL.txt")
-#opt$ref = ("/home/yrh8/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/invert-predict/Bsp-combined-20180719.inverts.txt")
-#opt$file = ("/home/yrh8/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/invert-predict/tmp-centers.txt")
+# opt$ref = ("/home/yrh8/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/20180614-Bp-check-gap1500-cat.NR.invertALL.txt")
+# opt$ref = ("/home/yrh8/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/invert-predict/Bsp-combined-20180719.inverts.txt")
+# opt$file = ("/home/yrh8/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/invert-predict/tmp-centers.txt")
 
 ### Set of observed single inversions for model building ###
 refs.df <- read.table(opt$ref,header=F,sep="\t")
@@ -106,13 +106,14 @@ write.table(IS481.df, file=opt$out,quote=F,sep="\t",row.names=F,col.names=F)
 #                aes(x=(as.numeric(as.character(V9))/1000),
 #                    y=(as.numeric(as.character(V10))/1000),color=V11),
 #                size=2.2, shape=2 ,stroke=1)
-#   + theme_minimal()
+#   + theme_classic(base_size = 12)
 #   + theme( legend.position = c(0.79,0.3),
-#            legend.background=element_rect(fill="white", size=0.75, color="black"))
-#   + scale_x_continuous(labels = comma, breaks = break1)
-#   + scale_y_continuous(labels = comma, breaks = break1)
-#   + coord_cartesian(xlim=c(0,1500),ylim=c(0,1500))
-#   + labs(x="Right replichore size (kbp)", y="Left replichore size (kbp)" )
+#            legend.background=element_rect(fill="white", size=0.75, color="black"),
+#            axis.text = element_text(color='black'))
+#   + scale_x_continuous(labels = comma, breaks = break1,expand = c(0,0))
+#   + scale_y_continuous(labels = comma, breaks = break1,expand = c(0,0))
+#   + coord_cartesian(xlim=c(0,1550),ylim=c(0,1550))
+#   + labs(x="Right boundary distance (kbp)", y="Left boundary distance (kbp)" )
 #   + geom_abline(aes(intercept=0,slope=1),lty=2, size=0.4)
 #   + geom_line(data = new.df, mapping = aes(x=V9/1000, y=lwr/1000),color="red",linetype='dashed')
 #   + geom_line(data = new.df, mapping = aes(x=V9/1000, y=upr/1000),color="red",linetype='dashed')
@@ -121,8 +122,8 @@ write.table(IS481.df, file=opt$out,quote=F,sep="\t",row.names=F,col.names=F)
 # )
 # 
 # 
-# ggsave("/home/yrh8/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/invert-predict/Bsp-combined-model-20180614.pdf", device = 'pdf', width = 6, height = 6, units = 'in', useDingbats=F)
-
+#  ggsave("/home/yrh8/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/invert-predict/Bsp-combined-model-20180803.pdf", device = 'pdf', width = 6, height = 6, units = 'in', useDingbats=F)
+# 
 # (ggplot( data = refs.ratio, aes(y=V7/1000,x=V11,color=V11)) #inverstion size
 #   + geom_jitter(width = 0.2, size=0.75) #, color="red")
 #   + geom_boxplot(outlier.size = 2, outlier.stroke = 0, alpha=0)
@@ -139,4 +140,4 @@ write.table(IS481.df, file=opt$out,quote=F,sep="\t",row.names=F,col.names=F)
 #   + xlim(0,3)
 #   + labs( x = "Log ratio")
 # )
-
+# 

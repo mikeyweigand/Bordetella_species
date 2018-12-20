@@ -5,27 +5,28 @@ library(GGally)
 library(network)
 library(sna)
 library(ggplot2)
-library(igraph)
+#library(igraph)
 library(scales)
+detach("package:igraph", unload=T)
+detach("package:circlize", unload=T)
 
-
-edges0316 <- read.csv("./04.colinear-mcl/20180221-Bp-check-gap1500-cat.NR.network-20180316.csv", header = F)
-net0316 <- network(edges0316, directed=F, matrix.type='edgelist', ignore.eval=F, names.eval=c("weights","symm"))
-nodesize0316 <- read.csv("./04.colinear-mcl/20180221-Bp-check-gap1500-cat.NR.nodesize-20180316.csv", 
-                         header=F,row.names=1)
-
-set.edge.attribute(net0316, "lty", ifelse(net0316 %e% "weights" > 1, 2, 1))
-set.edge.attribute(net0316, "color", ifelse(net0316 %e% "symm" > 1, "red", "black"))
-set.vertex.attribute(net0316, "cluster", 
-                     apply(data.frame(network.vertex.names(net0316)), 1, function(x) nodesize0316[x,])  )
-set.vertex.attribute(net0316, "singles",
-                     ifelse(grepl("Singleton",network.vertex.names(net0316)), "Singleton", "Cluster") )
-
-ggnet2(net0316, label=T, size="cluster", size.min = 0, label.size=3, max_size = 10,
-       mode = "fruchtermanreingold", #layout.par = list(cell.jitter = 0.5),
-       #mode = "kamadakawai", #layout.par = list(evsel = "size"),
-       color = ifelse(net0316 %v% "singles" == "Singleton", "blue", "gray"),
-       edge.lty="lty", edge.color = "color")
+# edges0316 <- read.csv("./04.colinear-mcl/20180221-Bp-check-gap1500-cat.NR.network-20180316.csv", header = F)
+# net0316 <- network(edges0316, directed=F, matrix.type='edgelist', ignore.eval=F, names.eval=c("weights","symm"))
+# nodesize0316 <- read.csv("./04.colinear-mcl/20180221-Bp-check-gap1500-cat.NR.nodesize-20180316.csv", 
+#                          header=F,row.names=1)
+# 
+# set.edge.attribute(net0316, "lty", ifelse(net0316 %e% "weights" > 1, 2, 1))
+# set.edge.attribute(net0316, "color", ifelse(net0316 %e% "symm" > 1, "red", "black"))
+# set.vertex.attribute(net0316, "cluster", 
+#                      apply(data.frame(network.vertex.names(net0316)), 1, function(x) nodesize0316[x,])  )
+# set.vertex.attribute(net0316, "singles",
+#                      ifelse(grepl("Singleton",network.vertex.names(net0316)), "Singleton", "Cluster") )
+# 
+# ggnet2(net0316, label=T, size="cluster", size.min = 0, label.size=3, max_size = 10,
+#        mode = "fruchtermanreingold", #layout.par = list(cell.jitter = 0.5),
+#        #mode = "kamadakawai", #layout.par = list(evsel = "size"),
+#        color = ifelse(net0316 %v% "singles" == "Singleton", "blue", "gray"),
+#        edge.lty="lty", edge.color = "color")
 
 ## updated 20180426
 edges0426 <- read.csv("./04.colinear-mcl/20180425-Bp-check-gap1500-cat.NR.network.csv", header = F)
@@ -40,7 +41,7 @@ set.vertex.attribute(net0426, "cluster",
 set.vertex.attribute(net0426, "singles",
                      ifelse(grepl("Singleton",network.vertex.names(net0426)), "Singleton", "Cluster") )
 
-netgraph2=ggnet2(net0426, label=F, size="cluster", size.min = 0, label.size=3, max_size = 20,
+netgraph2=ggnet2(net0426, label=T, size="cluster", size.min = 0, label.size=3, max_size = 20,
 #netgraph2=ggnet2(net0426, label=F, size=0, size.min = 0, label.size=3, max_size = 20,
        mode = "fruchtermanreingold", layout.par = list(niter = 2000 ,ncell =1500 ),# cell.jitter = 0.25),
        #mode = "target", #layout.par = list(evsel = "size"),
@@ -48,17 +49,18 @@ netgraph2=ggnet2(net0426, label=F, size="cluster", size.min = 0, label.size=3, m
        #shape = ifelse(net0426 %v% "singles" == "Singleton", 15, 19),
        edge.lty="lty", edge.color = "color")
 netgraph2
-ggsave("./99.figures/20180430-netgraph2.pdf", device = 'pdf', width = 8, height = 6, units = 'in', useDingbats=F)
+
+#ggsave("./99.figures/20180430-netgraph2.pdf", device = 'pdf', width = 8, height = 6, units = 'in', useDingbats=F)
 net0426
 
-netgraph
+#netgraph
 netgraph2.dat <- netgraph2$data
 netgraph2.top5=head(netgraph2.dat[order(-netgraph2.dat$size),], n=8)
 (netgraph2
   + geom_text(data=netgraph2.top5, aes(x=x,y=y,label = label)) #substr(label,9,1)))
 )
-ggsave("./99.figures/20180430-netgraph2-lables.pdf", device = 'pdf', width = 8, height = 6, units = 'in', useDingbats=F)
-
+#ggsave("./99.figures/20180430-netgraph2-lables.pdf", device = 'pdf', width = 8, height = 6, units = 'in', useDingbats=F)
+nrow(netgraph2.dat)
 
 
 
@@ -67,27 +69,27 @@ ggsave("./99.figures/20180430-netgraph2-lables.pdf", device = 'pdf', width = 8, 
 ?gplot.layout
 ?edge_betweenness
 ###############################################
-df = data.frame(cbind( network.vertex.names(net0316), 
-       degree(net0316, gmode="graph", ignore.eval = T),
-       get.vertex.attribute(net0316, attrname = "cluster") ) )
-colnames(df) <- c("Cluser","Centrality","Size")
-df[sort(-as.numeric(df$Size)),]
-plot(get.vertex.attribute(net0316, attrname = "cluster"),  
-     degree(net0316, gmode="graph", ignore.eval = T),
-     xlab = "Cluster size", ylab = "Centrality" )
-
-centralization(net0316, degree, mode="graph")
-cugtest(dat = net0316, gcor, gmode="graph" )
+# df = data.frame(cbind( network.vertex.names(net0316), 
+#        degree(net0316, gmode="graph", ignore.eval = T),
+#        get.vertex.attribute(net0316, attrname = "cluster") ) )
+# colnames(df) <- c("Cluser","Centrality","Size")
+# df[sort(-as.numeric(df$Size)),]
+# plot(get.vertex.attribute(net0316, attrname = "cluster"),  
+#      degree(net0316, gmode="graph", ignore.eval = T),
+#      xlab = "Cluster size", ylab = "Centrality" )
+# 
+# centralization(net0316, degree, mode="graph")
+# cugtest(dat = net0316, gcor, gmode="graph" )
 
 ## updated 20180426
 ?degree
 ?betweenness
 ?closeness
 ?centralization
-df = data.frame(cbind( network.vertex.names(net0426), 
-                       degree(net0426, gmode="graph", ignore.eval = T),
-                       get.vertex.attribute(net0426, attrname = "cluster") ) )
-centralization(net0426,g=10,closeness)
+# df = data.frame(cbind( network.vertex.names(net0426), 
+#                        degree(net0426, gmode="graph", ignore.eval = T),
+#                        get.vertex.attribute(net0426, attrname = "cluster") ) )
+# centralization(net0426,g=10,closeness)
 df = data.frame(cbind( network.vertex.names(net0426), 
                        evcent(net0426, gmode="graph",ignore.eval = T),
                        degree(net0426, gmode="graph", ignore.eval = T),
@@ -97,26 +99,21 @@ colnames(df) <- c("Cluster","Centrality","Degree","Size")
 df$Size <- as.numeric(as.character(df$Size))
 df$Centrality <- as.numeric(as.character(df$Centrality))
 df$Degree <- as.numeric(as.character(df$Degree))
-
-
-top5=head(df[order(-df$Centrality),], n=4)
-top4 = head(top5, n=4)
-
-(ggplot( data = df, aes(x=Degree, y=Centrality))
-  + geom_point(shape = 19, color="black")
-  + theme_minimal()
-#  + scale_x_continuous(limits=c(0,100))
-  #+ scale_y_continuous(limits=c(0,15))
-#  + labs(x="Cluster size", y="Centrality" )
-#  + geom_point( data = top4, aes(x=Size, y=Centrality), shape = 1, color ="red", size=6)
-  + geom_text( data = top5, aes(x=Degree, y=Centrality, label=Cluster),
-               vjust=-1.2, size=3, angle = 0, hjust = 1) #-0.01)
-#  + geom_segment(data = top5, aes(x = top5[3,3], y = top5[3,2], xend=top5[4,3], yend=top5[4,2]), lty=1, size=0.2)
-#  + geom_segment(data = top5, aes(x = top5[1,3], y = top5[1,2], xend=top5[2,3], yend=top5[2,2]), lty=1, size=0.2)
-#  + geom_segment(data = top5, aes(x = top5[3,3], y = top5[3,2], xend=top5[1,3], yend=top5[1,2]), lty=1, size=0.2)
-#  + geom_segment(data = top5, aes(x = top5[4,3], y = top5[4,2], xend=top5[2,3], yend=top5[2,2]), lty=1, size=0.2)
-  )
-ggsave("./99.figures/20180430-centrality.pdf", device = 'pdf', width = 6, height = 6, units = 'in', useDingbats=F)
+#write.table(x = df, file="./04.colinear-mcl/20180425-Bp-check-gap1500-cat.NR.network-output.tsv", sep="\t",quote = F)
+nrow(df)
+top5=head(df[order(-df$Degree),], n=7)
+head(df)
+(ggplot( data = df, aes(x=Degree, y=Size))
+  + geom_jitter(shape = 19, color="black", alpha=0.5, width=0.2,height=0.2, size=2.5)
+  + theme_classic(base_size = 10)
+  + theme(axis.text = element_text(color='black'))
+  + scale_y_continuous(limits=c(0,100),expand = c(0,0))
+  + scale_x_continuous(limits=c(0,15),expand = c(0,0))
+  + labs(y="Cluster size", x="Degree centrality" )
+  + geom_text( data = top5, aes(y=Size, x=Degree, label=Cluster),
+              vjust=-1.2, size=3, angle = 0, hjust = 1) #-0.01)
+)
+ggsave("./99.figures/20180906-centrality.pdf", device = 'pdf', width = 4, height = 4, units = 'in', useDingbats=F)
 
 
 
@@ -142,7 +139,7 @@ sym0430 <- read.table("./04.colinear-mcl/20180425-Bp-check-gap1500-cat.NR.invert
            panel.grid.minor.y = element_blank(),
            panel.grid.major.x = element_blank())
 )
-ggsave("./99.figures/Inversion-size.pdf", device = 'pdf', width = 6, height = 6, units = 'in', useDingbats=F)
+#ggsave("./99.figures/Inversion-size.pdf", device = 'pdf', width = 6, height = 6, units = 'in', useDingbats=F)
 
 
 
@@ -202,7 +199,7 @@ nrow()
   
 )
 
-ggsave("./99.figures/Replichore-symm.pdf", device = 'pdf', width = 6, height = 6, units = 'in', useDingbats=F)
+#ggsave("./99.figures/Replichore-symm.pdf", device = 'pdf', width = 6, height = 6, units = 'in', useDingbats=F)
 
 
 ###################
