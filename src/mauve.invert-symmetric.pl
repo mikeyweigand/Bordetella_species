@@ -56,7 +56,7 @@ while(my$i = <IN>){
 
 			}else{
 
-				if($size){
+				if($size || $ref){
 					print "\t". &INVsize($si[2], $si[3], $total);
 				}
 
@@ -93,7 +93,7 @@ while(my$i = <IN>){
 
 				}else{
 					print "\tAsymmetric";
-					if($size){ print "\t-\t-\t-"};
+					if($size || $ref){ print "\t-\t-\t-"};
 					print "\n";
 				}
 			}
