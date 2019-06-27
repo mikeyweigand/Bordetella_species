@@ -1,3 +1,5 @@
+# This script takes the outputs from jellyfish and draws line plots of kmer copy number abundance.
+
 setwd("~/Documents/Bordetella_species/results/jellyfish/")
 library(ggplot2)
 library(scales)
@@ -14,7 +16,6 @@ library(reshape)
 #   + geom_line()
 #   + coord_cartesian(ylim=c(0,1000),xlim=c(0,80))
 # )
-
 
 ### B. pertussis ###
 # hist.Bp = read.table("./20180222/hist/Bp-15mer.hist", header=T, sep="\t")
@@ -114,6 +115,15 @@ library(reshape)
 #   + scale_x_continuous(name = "Frequency")
 #   + coord_cartesian(ylim=c(0,1500),xlim=c(0,50))
 # )
+#
+# (ggplot( hist.Breps, aes(x=Tag, y=Bpetrii_DSM12804.15mer))
+#   + geom_line()
+#   + geom_point(size = 0.5)
+#   + scale_y_continuous(label=comma,name = "Average Number of 15-mers")
+#   + scale_x_continuous(name = "Frequency")
+#   + coord_cartesian(ylim=c(0,1500),xlim=c(0,50))
+# )
+
 
 ### Representative subset ###
 #hist.Breps = read.table("./20180222/hist/Reps-15mer.hist", header=T, sep="\t")
@@ -121,7 +131,6 @@ hist.Breps = read.table("./20180222/hist/Reps-15mer.20181129.hist", header=T, se
 hist.Breps.melted <- melt(hist.Breps, id = "Tag")
 head(hist.Breps.melted)
 (ggplot( data = subset(hist.Breps.melted, Tag > 1 ), aes(x=Tag, y=value, color = variable))
-  #+ geom_col(position="dodge") #size=0.25)
   + geom_line()
   + coord_cartesian(ylim=c(0,1550),xlim=c(0,27))
   + theme_classic(base_size = 14)
@@ -136,12 +145,11 @@ head(hist.Breps.melted)
   )
   + labs(x="Copy number", y="15-mer count" )
 )
-ggsave("./20180222/99.figures/20181129-Reps-15mer.pdf", device = 'pdf', width = 6, height = 3, units = 'in', useDingbats=F)
+#ggsave("./20180222/99.figures/20181129-Reps-15mer.pdf", device = 'pdf', width = 6, height = 3, units = 'in', useDingbats=F)
 
 hist.bp.bho = subset(hist.Breps.melted, subset = variable %in% c('Bho_F615.15mer','Bp_H627.15mer'))
 head(hist.bp.bho)
 (ggplot( data = subset(hist.bp.bho, Tag > 1 ), aes(x=Tag, y=value, color = variable))
-  #+ geom_col(position="dodge") #size=0.25)
   + geom_line()
   + coord_cartesian(ylim=c(0,1550),xlim=c(0,155))
   + theme_classic(base_size = 14)
@@ -154,14 +162,8 @@ head(hist.bp.bho)
   )
   + labs(x="Copy number", y="15-mer count" )
 )
-ggsave("./20180222/99.figures/20180803-Reps-15mer-Bp-Bho.pdf", device = 'pdf', width = 3, height = 3, units = 'in', useDingbats=F)
+#ggsave("./20180222/99.figures/20180803-Reps-15mer-Bp-Bho.pdf", device = 'pdf', width = 3, height = 3, units = 'in', useDingbats=F)
 
 
 
-# (ggplot( hist.Breps, aes(x=Tag, y=Bpetrii_DSM12804.15mer))
-#   + geom_line()
-#   + geom_point(size = 0.5)
-#   + scale_y_continuous(label=comma,name = "Average Number of 15-mers")
-#   + scale_x_continuous(name = "Frequency")
-#   + coord_cartesian(ylim=c(0,1500),xlim=c(0,50))
-# )
+

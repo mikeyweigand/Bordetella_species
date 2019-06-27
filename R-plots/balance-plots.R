@@ -1,12 +1,11 @@
+# This script plots the density of observed replichore balance or single-inversion balance.
+
 setwd("~/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/balance/")
 library(ggplot2)
 library(scales)
 
-# balance.df = read.table("~/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/balance/Bp-check-gap1500-mcl.NR.balance.txt",header=F, sep="\t")
-# head(balance.df)
-
-log.df = read.table("~/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/balance/Bp-check-gap1500-mcl.NR.balance-log.txt",header=F, sep="\t")
-head(log.df)
+##### Replichore balance observed in 107 unique B. pertussis chromosome structures
+log.df = read.table("./Bp-check-gap1500-mcl.NR.balance-log.txt",header=F, sep="\t")
 (ggplot( data = log.df, aes(x=V2))
   + geom_density(color="black",fill="grey",alpha=0.4, size=0.75)  
   #  + geom_histogram(binwidth = 0.04,color="blue",fill="blue",alpha=0.4)
@@ -16,26 +15,21 @@ head(log.df)
   + scale_y_continuous(expand = c(0,0))
   + labs(x="Replichore balance |ln(ratio)|", y="Density" )
   + theme(axis.text = element_text(color='black'))
-  
 )
 
-#ggsave("~/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/balance/20180803-Replichores.pdf", device = 'pdf', width = 3, height = 3, units = 'in', useDingbats=F)
+#ggsave("./20180803-Replichores.pdf", device = 'pdf', width = 3, height = 3, units = 'in', useDingbats=F)
 
 
-##############
-
-refs = read.table("/home/yrh8/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/invert-predict/Bsp-combined-20180719.inverts.txt", header=F,sep="\t")
-head(refs)
+##### Single-inversion balance observed in B. pertussis and predicted with the linear model
+refs = read.table("../invert-predict/Bsp-combined-20180719.inverts.txt", header=F,sep="\t")
 refs.symmetric = subset(refs, V11 == "ori" | V11 == "term")
 ratio = abs(log(as.numeric(as.character(refs.symmetric$V9))/as.numeric(as.character(refs.symmetric$V10))))
 refs.ratio = cbind(refs.symmetric, ratio)
-head(refs.ratio)
 
-J549.pred = read.table("/home/yrh8/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/invert-predict/J549-ISall-inverts-20180719.txt", header=F, sep="\t")
+#model prediction
+J549.pred = read.table("../invert-predict/J549-ISall-inverts-20180719.txt", header=F, sep="\t")
 J549.ratio = abs(log(as.numeric(as.character(J549.pred$V10))/as.numeric(as.character(J549.pred$V11))))
-head(J549.pred)
 J549.pred = cbind(J549.pred, J549.ratio)
-
 
 (ggplot()
   + geom_histogram( data = refs.ratio, mapping=aes(x=ratio, fill=V11,color=V11),
@@ -51,16 +45,12 @@ J549.pred = cbind(J549.pred, J549.ratio)
   + geom_density( data = J549.pred, mapping=aes(x=J549.ratio, y=..scaled..*10), color='black', size=0.75, linetype=3)
 )
 
-#ggsave("~/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/balance/20180822-symmetric-inverts.pdf", device = 'pdf', width = 3, height = 3, units = 'in', useDingbats=F)
+#ggsave("./20180822-symmetric-inverts.pdf", device = 'pdf', width = 3, height = 3, units = 'in', useDingbats=F)
 
 
-###################
-
-bal = read.table("~/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/balance/cluster-size-v-balance.csv", header=F,sep=",")
-head(bal)
-
+##### Replichore balance vs colinear cluster size
+bal = read.table("./cluster-size-v-balance.csv", header=F,sep=",")
 top5=head(bal[order(-bal$V2),], n=6)
-
 
 (ggplot() #data = bal, aes(x=V3,y=V2))
   + geom_point(data = subset(bal, V2 > 1), aes(x=V3,y=V2),
@@ -76,6 +66,6 @@ top5=head(bal[order(-bal$V2),], n=6)
                vjust=2.5, size=3, angle = 0, hjust = 0.01)
 )
 
-#ggsave("~/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/balance/20180814-cluster-v-balance.pdf", device = 'pdf', width = 4, height = 4, units = 'in', useDingbats=F)
+#ggsave("./20180814-cluster-v-balance.pdf", device = 'pdf', width = 4, height = 4, units = 'in', useDingbats=F)
 
 

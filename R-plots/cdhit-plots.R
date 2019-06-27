@@ -1,3 +1,5 @@
+# This script takes the outputs from cdhit and draws bar plots of gene copy number abundance.
+
 setwd("~/Documents/Bordetella_species/results/cd-hit/")
 library(ggplot2)
 library(scales)
@@ -27,8 +29,8 @@ subset(cdhit.Breps.melted, value != 0 )
   )
   + labs(x="Copy number", y="Gene count" )
 )
-ggsave("./20180222/99.figures/20181130-Reps-clster-hist.pdf", device = 'pdf', width = 6, height = 3, units = 'in', useDingbats=F)
-# ggsave("/media/cdc_documents/Abstracts/ASM2018/poster-figs/Reps-clster-hist02.pdf", device = 'pdf', width = 8, height = 6, units = 'in', useDingbats=F)
+#ggsave("./20180222/99.figures/20181130-Reps-clster-hist.pdf", device = 'pdf', width = 6, height = 3, units = 'in', useDingbats=F)
+#ggsave("./20180222/99.figures/Reps-clster-hist02.pdf", device = 'pdf', width = 8, height = 6, units = 'in', useDingbats=F)
 
 bp.bho = subset(cdhit.Breps.melted, subset = variable %in% c('F615_CP018899','H627_CP010962'))
 head(bp.bho)
@@ -46,5 +48,5 @@ head(bp.bho)
   )
   + labs(x="Copy number", y="Gene count" )
 )
-ggsave("./20180222/99.figures/20180803-Reps-clster-hist-Bp-Bho.pdf", device = 'pdf', width = 3, height = 3, units = 'in', useDingbats=F)
+#ggsave("./20180222/99.figures/20180803-Reps-clster-hist-Bp-Bho.pdf", device = 'pdf', width = 3, height = 3, units = 'in', useDingbats=F)
 
