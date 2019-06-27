@@ -1,5 +1,6 @@
 data/*
 results/*
-src/cdhit_plot_len1.pl
+
 tmp*
 makeblastdb.log
+local/*
