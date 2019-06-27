@@ -57,7 +57,7 @@ sub HELP_MESSAGE { die "
 .Description:
    Makes a summary table from a sorted cdhit cluster file.
 
-.Usage: $0 -in -out
+.Usage: $0 -in [in] -out [out]
 
    [mandatory]
 	 -in	<in>	Input cluster file. MUST be sorted.
@@ -65,7 +65,7 @@ sub HELP_MESSAGE { die "
 
    [optional]
 	 -min	<int>	Minimum cluster size (Default = 1).
-	 -q			Run quietly.
+	 -q		Run quietly.
 
    [dependencies]
 

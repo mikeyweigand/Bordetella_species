@@ -91,9 +91,9 @@ if($densplot){
 
 sub HELP_MESSAGE { die "
 .Description:
-   Takes set of cdhit cluster distribution files from plot_len.pl and draws a plot.
+   Takes set of cdhit cluster distribution files from plot_len.pl and draws a simple plot.
 
-.Usage: $0 -in -out
+.Usage: $0 -in [in.txt] -out [out.png]
 
    [mandatory]
 	 -in	<in.txt>	List of paths to cluster distribution files.

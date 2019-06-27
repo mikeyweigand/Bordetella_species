@@ -73,13 +73,13 @@ while(my$din = <DIST>){
 
 sub HELP_MESSAGE { die "
 .Description:
-   Determine pairwise distances among isolates clustered in 'colinear' groups.
+   Determine pairwise SNP distances among isolates clustered in 'colinear' groups.
 
 .Usage: $0 -mcl [mcl.tsv] -d [dist.tsv] -names [names.tsv] > out.txt
 
    [mandatory]
 	 -mcl	<mcl.tsv>	Input of clusters, probably the output from 'mauve.collinear-mcl.pl'.
-	 -d	<dist.tsv>	3-column table of pariwise distances between all isolates.
+	 -d	<dist.tsv>	3-column table of pariwise SNP distances between all isolates.
 	 -names	<names.tsv>	2-column table matching isolate names between input files.
 
    [optional]

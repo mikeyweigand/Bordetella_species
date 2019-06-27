@@ -37,14 +37,14 @@ foreach my$f (@files){
 
 sub HELP_MESSAGE { die "
 .Description:
-   Find and copy mauve (or related) files for pairwise alignment of genomes in list.
+   Find and copy mauve (or related) files for pairwise alignment of genomes in list from a directory of many alignment output files.
 
 .Usage: $0 -indir [dir] -outdir [dir] -list [list.txt] -ext [str]
 
    [mandatory]
-	 -indir		Directory of all files.
-	 -ext		File extension to match (eg. backbone or backbone.clean).
-	 -outdir	Directory to copy files.
+	 -indir		Source directory of many alignment files.
+	 -ext		File extension to match (eg. 'backbone' or 'backbone.clean').
+	 -outdir	Destination directory to copy files.
 	 -list		List of genomes.
 
    [optional]
