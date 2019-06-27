@@ -1,4 +1,14 @@
 #!/usr/bin/R Rscript
+
+# This script will calculate a linear model based on observed single inversions 
+# and then predicted all possible inversions between a set of IS element positions.
+
+# These calculations should NOT be run directly, but called from the wrapper 
+# 'inverts.predict.pl'.
+
+# Additional functions at the bottom are included for drawing the accompanying plots
+# directly from within Rstudio.
+
 library(optparse)
 library(ggplot2)
 library(scales)
