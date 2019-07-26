@@ -21,3 +21,5 @@ Also described in Weigand *et al.* 20XX:
 ------
 ### Disclaimer  
 The contents of this repository are intended for research purposes only and come with no guarantees of their performance.
+
+Analyses for publication were largely performed on a desktop computer with Ubuntu 14.04 LTS, perl v5.18.2, and R v3.4.4. See Weigand *et al.* 20XX for additional information.
