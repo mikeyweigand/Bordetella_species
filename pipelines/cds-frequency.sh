@@ -3,8 +3,9 @@
 if [[ "$1" == "" || "$1" == "-h" ]] ; then
    echo "
    This script will run cdhit-est on a directory full of gene sequence multi-fasta files and output files to './results/cd-hit/YYYYMMDD/'
-	 If necessary, it will first extract CDS sequences from the Genbank files using gbk2genes.pl (Scriptbox).
-	 Expects cdhit-est in PATH.
+
+   -> If necessary, it will first extract CDS sequences from the Genbank files using ./src/gbk2genes.pl.
+   -> Expects 'cdhit-est' is in \$PATH.
 
    Usage: ./pipelines/cds-frequency.sh [folder] [genes]
 
@@ -29,7 +30,7 @@ do
 	o=$(basename $i gbk)fna;
 
 	if [ ! -f $2/$o ];then
-		gbk2genes.pl -in $i -s > $2/$o;
+		./src/gbk2genes.pl -in $i -s > $2/$o;
 	fi
 
 done
