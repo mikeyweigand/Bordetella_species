@@ -1,4 +1,4 @@
-# This script takes the outputs from jellyfish and draws line plots of kmer copy number abundance.
+# This script takes the outputs from jellyfish and draws line plots of kmer copy number abundance. Intended to be run interactively in Rstudio.
 
 setwd("~/Documents/Bordetella_species/results/jellyfish/")
 library(ggplot2)
@@ -22,7 +22,7 @@ library(reshape)
 # hist.Bp2 <- cbind(hist.Bp, rowMeans(hist.Bp[-1]))
 # colnames(hist.Bp2)[dim(hist.Bp2)[2]] = "Mean"
 # hist.Bp2.melted <- melt(hist.Bp2, id = "Tag")
-# 
+#
 # (ggplot( data = hist.Bp2.melted, aes(x=Tag, y=value, color = variable))
 #   + geom_point(size=0.5)
 #   + geom_line()
@@ -41,7 +41,7 @@ library(reshape)
 # hist.Bpp2 <- cbind(hist.Bpp, rowMeans(hist.Bpp[-1]))
 # colnames(hist.Bpp2)[dim(hist.Bpp2)[2]] = "Mean"
 # hist.Bpp2.melted <- melt(hist.Bpp2, id = "Tag")
-# 
+#
 # (ggplot( data = hist.Bpp2.melted, aes(x=Tag, y=value, color = variable))
 #   + geom_point(size=0.5)
 #   + geom_line()
@@ -53,7 +53,7 @@ library(reshape)
 # hist.Bho2 <- cbind(hist.Bho, rowMeans(hist.Bho[-1]))
 # colnames(hist.Bho2)[dim(hist.Bho2)[2]] = "Mean"
 # hist.Bho2.melted <- melt(hist.Bho2, id = "Tag")
-# 
+#
 # (ggplot( data = hist.Bho2.melted, aes(x=Tag, y=value, color = variable))
 #   + geom_point(size=0.5)
 #   + geom_line()
@@ -65,7 +65,7 @@ library(reshape)
 # hist.Bhi2 <- cbind(hist.Bhi, rowMeans(hist.Bhi[-1]))
 # colnames(hist.Bhi2)[dim(hist.Bhi2)[2]] = "Mean"
 # hist.Bhi2.melted <- melt(hist.Bhi2, id = "Tag")
-# 
+#
 # (ggplot( data = hist.Bhi2.melted, aes(x=Tag, y=value, color = variable))
 #   + geom_point(size=0.5)
 #   + geom_line()
@@ -77,7 +77,7 @@ library(reshape)
 # hist.Ba2 <- cbind(hist.Ba, rowMeans(hist.Ba[-1]))
 # colnames(hist.Ba2)[dim(hist.Ba2)[2]] = "Mean"
 # hist.Ba2.melted <- melt(hist.Ba2, id = "Tag")
-# 
+#
 # (ggplot( data = hist.Ba2.melted, aes(x=Tag, y=value, color = variable))
 #   + geom_point(size=0.5)
 #   + geom_line()
@@ -89,7 +89,7 @@ library(reshape)
 # hist.Bt2 <- cbind(hist.Bt, rowMeans(hist.Bt[-1]))
 # colnames(hist.Bt2)[dim(hist.Bt2)[2]] = "Mean"
 # hist.Bt2.melted <- melt(hist.Bt2, id = "Tag")
-# 
+#
 # (ggplot( data = hist.Bt2.melted, aes(x=Tag, y=value, color = variable))
 #   + geom_point(size=0.5)
 #   + geom_line()
@@ -101,13 +101,13 @@ library(reshape)
 # hist.Bsp2 <- cbind(hist.Bsp, rowMeans(hist.Bsp[-1]))
 # colnames(hist.Bsp2)[dim(hist.Bsp2)[2]] = "Mean"
 # hist.Bsp2.melted <- melt(hist.Bsp2, id = "Tag")
-# 
+#
 # (ggplot( data = hist.Bsp2.melted, aes(x=Tag, y=value, color = variable))
 #   + geom_point(size=0.5)
 #   + geom_line()
 #   + coord_cartesian(ylim=c(0,1000),xlim=c(0,60))
 # )
-# 
+#
 # (ggplot( hist.Bhi2, aes(x=Tag, y=Bhi_H720.15mer))
 #   + geom_line()
 #   + geom_point(size = 0.5)
@@ -163,7 +163,3 @@ head(hist.bp.bho)
   + labs(x="Copy number", y="15-mer count" )
 )
 #ggsave("./20180222/99.figures/20180803-Reps-15mer-Bp-Bho.pdf", device = 'pdf', width = 3, height = 3, units = 'in', useDingbats=F)
-
-
-
-

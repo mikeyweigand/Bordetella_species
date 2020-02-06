@@ -1,4 +1,4 @@
-# This script takes the outputs from cdhit and draws bar plots of gene copy number abundance.
+# This script takes the outputs from cdhit and draws bar plots of gene copy number abundance. Intended to be run interactively in Rstudio.
 
 setwd("~/Documents/Bordetella_species/results/cd-hit/")
 library(ggplot2)
@@ -49,4 +49,3 @@ head(bp.bho)
   + labs(x="Copy number", y="Gene count" )
 )
 #ggsave("./20180222/99.figures/20180803-Reps-clster-hist-Bp-Bho.pdf", device = 'pdf', width = 3, height = 3, units = 'in', useDingbats=F)
-

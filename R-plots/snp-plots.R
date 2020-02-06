@@ -1,4 +1,4 @@
-# This script plots pairwise SNP distances within species or colinear structure clusters.
+# This script plots pairwise SNP distances within species or colinear structure clusters. Intended to be run interactively in Rstudio.
 
 setwd("~/Documents/Bordetella_species/results/mauve/20180221-Bp/")
 
@@ -58,7 +58,7 @@ rev=sort(unique(clust.years$V3)) #, decreasing =F)
   + geom_jitter(width = 0.1, height=0.35, size=1, color="red")
   + scale_y_discrete(limits=sort(unique(clust.years$V3),decreasing=T) )
   + theme_minimal(base_size = 16)
-  + theme(axis.text.x=element_text(angle=45, hjust=1), 
+  + theme(axis.text.x=element_text(angle=45, hjust=1),
           panel.grid.minor.x = element_blank(),
           axis.text=element_text(color='black'))
   + labs(y="Colinear cluster", x="Year of Isolation")
@@ -72,12 +72,14 @@ rev=sort(unique(clust.years$V3)) #, decreasing =F)
 
 ##### Bordetella species comparison of within-species SNP distances #
 
-pairwise.snps <- read.table("../../kSNP/20180501-SNP-dist/20180501-pairwiseSNPs-down-plusComplexes.tsv",sep="\t",header=F);
+#pairwise.snps <- read.table("../../kSNP/20180501-SNP-dist/20180501-pairwiseSNPs-down-plusComplexes.tsv",sep="\t",header=F);
+pairwise.snps <- read.table("../../kSNP/20180501-SNP-dist/20190826-pairwiseSNPs-down-CORRECTED.tsv",sep="\t",header=F);
 pairwise.snps$V1 <- factor(pairwise.snps$V1, levels = c("Bbronchiseptica","Bb_complexI","Bb_complexIV","Bholmesii","Bparapertussis","Bpertussis"), ordered=T)
+
 #pairwise.snps$V1
 (ggplot( data = pairwise.snps, aes(x=V1, y=V2))
  + geom_jitter(width = 0.2, size=1.5, color="red")
- + geom_boxplot(outlier.size = 0, outlier.stroke = 0, alpha=0)
+ + geom_boxplot(outlier.size = 0, outlier.stroke = 0, alpha=0, color='black')
  + theme_minimal(base_size = 16)
  + theme(axis.text.x=element_text(angle=25, hjust=1), axis.text=element_text(color='black'))
  + labs(x="Species", y="Pairwise SNP distance")
@@ -85,19 +87,40 @@ pairwise.snps$V1 <- factor(pairwise.snps$V1, levels = c("Bbronchiseptica","Bb_co
 )
 #ggsave("./99.figures/20180726-pairwiseSNPs-down.pdf", device = 'pdf', width = 6, height = 5, units = 'in', useDingbats=F)
 
-# Subset B. pertussis and B. parapertussis only
-pairwise.pert <-subset(pairwise.snps,V1 == "Bparapertussis" | V1 == "Bpertussis")
-nrow(pairwise.pert)
+
+# Subset B. pertussis, B.holmesii, and B. parapertussis only
+pairwise.pert <-subset(pairwise.snps,V1 == "Bparapertussis" | V1 == "Bpertussis" | V1 == "Bholmesii")
+#nrow(pairwise.pert)
+#mean(subset(pairwise.snps, V1 == "Bholmesii")[,2])
 
 (ggplot( data = pairwise.pert, aes(x=V1, y=V2))
-  + geom_jitter(width = 0.2, size=1.5, color="red")
-  + geom_boxplot(outlier.size = 0, outlier.stroke = 0, alpha=0)
-  + theme_minimal(base_size = 16)
+  + geom_jitter(width = 0.2, size=1.2, color="red")
+  + geom_boxplot(outlier.size = 0, outlier.stroke = 0, alpha=0, color='black')
+  + theme_minimal(base_size = 14)
+  + labs(x="Species", y="Pairwise SNP distance")
+  + scale_y_continuous( labels = comma , limits=c(0,500))
+  + theme( panel.grid.major.x = element_blank(),
+           panel.grid.minor = element_blank(),
+           axis.text.x = element_blank(),
+           #axis.text.x=element_text(angle=25, hjust=1),
+           axis.text=element_text(color='black'))
+)
+#ggsave("./99.figures/20190826-pairwiseSNPs-Bp-CORRECTED.pdf", device = 'pdf', width = 3, height = 3.5, units = 'in', useDingbats=F)
+
+# Subset Bb only
+pairwise.bb <-subset(pairwise.snps,V1 == "Bbronchiseptica" | V1 == "Bb_complexI" | V1 == "Bb_complexIV")
+#nrow(pairwise.bb)
+
+(ggplot( data = pairwise.bb, aes(x=V1, y=V2))
+  + geom_jitter(width = 0.2, size=1.2, color="red")
+  + geom_boxplot(outlier.size = 0, outlier.stroke = 0, alpha=0, color='black')
+  + theme_minimal(base_size = 14)
   + labs(x="Species", y="Pairwise SNP distance")
   + scale_y_continuous( labels = comma )#, limits=c(0,500))
   + theme( panel.grid.major.x = element_blank(),
-           axis.text.x=element_text(angle=25, hjust=1), 
+           panel.grid.minor = element_blank(),
+           axis.text.x = element_blank(),
+           #axis.text.x=element_text(angle=25, hjust=1),
            axis.text=element_text(color='black'))
 )
-#ggsave("./99.figures/20180726-pairwiseSNPs-Bp2.pdf", device = 'pdf', width = 4, height = 3.5, units = 'in', useDingbats=F)
-
+ggsave("./99.figures/20190823-pairwiseSNPs-Bb-CORRECTED.pdf", device = 'pdf', width = 3, height = 3.5, units = 'in', useDingbats=F)

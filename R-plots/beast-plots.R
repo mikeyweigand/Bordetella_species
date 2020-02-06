@@ -1,4 +1,4 @@
-# This script draws a coorelation plot from Tempest and a nice tree from the BEAST output
+# This script draws a coorelation plot from Tempest and a nice tree from the BEAST output. Intended to be run interactively in Rstudio.
 
 setwd("~/Documents/Bordetella_species/results/beast/")
 library("ape")
@@ -17,7 +17,7 @@ beast <- (ggtree(beast.tree, right=T, ladderize=T, mrsd="2016-01-01",size=.35)
           legend.text=element_text(size=7),
           legend.title=element_text(size=10),
           panel.grid.major.y = element_blank(),
-          panel.grid.minor.y = element_blank()) 
+          panel.grid.minor.y = element_blank())
   + labs(x="Year")
 )
 
@@ -44,7 +44,7 @@ tempest <- read.table("./C734-core-ALL_drop75cov_plusYear.rtt.txt",sep="\t",head
 (ggplot( data = tempest, aes(x=date,y=distance))
   + geom_jitter(fill="light grey", alpha=0.5)
   + geom_smooth(method=lm, formula = y ~ x, fullrange=T, se=F)
-  + geom_vline(xintercept=1983, size=0,color="white") 
+  + geom_vline(xintercept=1983, size=0,color="white")
   + geom_vline(xintercept=2020, size=0,color="white")
   + theme_classic(base_size = 14)
   + coord_cartesian(xlim=c(1980,2020), ylim=c(0,0.025))
@@ -54,4 +54,3 @@ tempest <- read.table("./C734-core-ALL_drop75cov_plusYear.rtt.txt",sep="\t",head
 )
 
 #ggsave("./C734-core-ALL_drop75cov_plusYear.rtt.pdf", device = 'pdf', width = 3, height = 3, units = 'in', useDingbats=F)
-

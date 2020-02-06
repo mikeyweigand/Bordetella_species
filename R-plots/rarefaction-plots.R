@@ -1,6 +1,6 @@
-# This script calculates a rare faction curve from the colinear structure clusters observed in years 2000 - 2010.
+# This script calculates a rare faction curve from the colinear structure clusters observed in years 2000-2010. Intended to be run interactively in Rstudio.
 
-setwd("/home/yrh8/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/rarefaction")
+setwd("~/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/rarefaction")
 library(vegan)
 
 Bp.y2k10 = read.table("20180425-Bp-check-gap1500-mcl-rarefaction-years2k10.txt", sep="\t", header=T)

@@ -1,4 +1,4 @@
-# This script plots the density of observed replichore balance or single-inversion balance.
+# This script plots the density of observed replichore balance or single-inversion balance. Intended to be run interactively in Rstudio.
 
 setwd("~/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/balance/")
 library(ggplot2)
@@ -7,7 +7,7 @@ library(scales)
 ##### Replichore balance observed in 107 unique B. pertussis chromosome structures
 log.df = read.table("./Bp-check-gap1500-mcl.NR.balance-log.txt",header=F, sep="\t")
 (ggplot( data = log.df, aes(x=V2))
-  + geom_density(color="black",fill="grey",alpha=0.4, size=0.75)  
+  + geom_density(color="black",fill="grey",alpha=0.4, size=0.75)
   #  + geom_histogram(binwidth = 0.04,color="blue",fill="blue",alpha=0.4)
   + theme_classic(base_size = 14)
   + coord_cartesian(ylim=c(0,6),xlim=c(0,1.3))
@@ -68,4 +68,39 @@ top5=head(bal[order(-bal$V2),], n=6)
 
 #ggsave("./20180814-cluster-v-balance.pdf", device = 'pdf', width = 4, height = 4, units = 'in', useDingbats=F)
 
+bho = read.table("/home/yrh8/Documents/Bordetella_species/results/mauve/Bsp-combined-20190903/Bho_cluster-size-v-balance.csv", header=F,sep=",")
+topho=head(bho[order(-bho$V2),], n=4)
 
+(ggplot() #data = bal, aes(x=V3,y=V2))
+  + geom_point(data = subset(bho, V2 > 1), aes(x=V3,y=V2),
+               shape = 19, color="black", alpha=0.5,size=2)
+  + geom_point(data = subset(bho, V2 == 1), aes(x=V3,y=V2),
+               shape = 19, color="red", alpha=0.5,size=2)
+  + theme_classic(base_size = 10)
+  + theme(axis.text = element_text(color='black'))
+  + scale_x_continuous(limits=c(0,0.8),expand = c(0,0))
+  + scale_y_continuous(limits=c(0,50),expand = c(0,0))
+  + labs(y="Cluster size", x="Replichore balance |ln(ratio)|" )
+  + geom_text( data = topho, aes(x=V3, y=V2, label=V1),
+               vjust=2.5, size=3, angle = 0, hjust = 0.01)
+)
+#ggsave("/home/yrh8/Documents/Bordetella_species/results/mauve/Bsp-combined-20190903/20190904-Bho-cluster-v-balance.pdf", device = 'pdf', width = 4, height = 4, units = 'in', useDingbats=F)
+
+
+bpp = read.table("/home/yrh8/Documents/Bordetella_species/results/mauve/Bsp-combined-20190903/Bpp_cluster-size-v-balance.csv", header=F,sep=",")
+toppp=head(bpp[order(-bpp$V2),], n=2)
+
+(ggplot() #data = bal, aes(x=V3,y=V2))
+  + geom_point(data = subset(bpp, V2 > 1), aes(x=V3,y=V2),
+               shape = 19, color="black", alpha=0.5,size=2)
+  + geom_point(data = subset(bpp, V2 == 1), aes(x=V3,y=V2),
+               shape = 19, color="red", alpha=0.5,size=2)
+  + theme_classic(base_size = 10)
+  + theme(axis.text = element_text(color='black'))
+  + scale_x_continuous(limits=c(0,0.8),expand = c(0,0))
+  + scale_y_continuous(limits=c(0,50),expand = c(0,0))
+  + labs(y="Cluster size", x="Replichore balance |ln(ratio)|" )
+  + geom_text( data = toppp, aes(x=V3, y=V2, label=V1),
+               vjust=2.5, size=3, angle = 0, hjust = 0.01)
+)
+#ggsave("/home/yrh8/Documents/Bordetella_species/results/mauve/Bsp-combined-20190903/20190904-Bpp-cluster-v-balance.pdf", device = 'pdf', width = 4, height = 4, units = 'in', useDingbats=F)
