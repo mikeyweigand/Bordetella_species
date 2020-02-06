@@ -18,16 +18,20 @@ while(my$l = <LIST>){
 }
 close LIST;
 
+print "\nSearching for ". scalar(keys%hash) . " genomes in ";
+
 my$infiles = qx( find $indir -name "*$ext*" );
 my@files = split("\n",$infiles);
-print @files . "\n";
+print @files . " found alignment files.\n\n";
 
 foreach my$f (@files){
 	#my($ext) = $f =~ /(\.xmfa[\.\w]+$)/;
 	my$name = basename($f, $ext); # (".xmfa.backbone",".xmfa.backbone.clean"));
 	my@genomes=split("-",$name);
+	#print join("\t",@genomes)."\n";
 	if((exists($hash{ $genomes[0] })) && (exists($hash{ $genomes[1] })) ){
 		#print $f."\t". $name."\n";
+		print "\t". join("\t",@genomes)."\n";
 		system("cp $f $outdir/ ")
 	}
 
@@ -43,7 +47,7 @@ sub HELP_MESSAGE { die "
 
    [mandatory]
 	 -indir		Source directory of many alignment files.
-	 -ext		File extension to match (eg. 'backbone' or 'backbone.clean').
+	 -ext		File extension to match (eg. '.xmfa.backbone' or '.xmfa.backbone.clean').
 	 -outdir	Destination directory to copy files.
 	 -list		List of genomes.
 
