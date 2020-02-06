@@ -1,9 +1,9 @@
 #!/usr/bin/R Rscript
 
-# This script will calculate a linear model based on observed single inversions 
+# This script will calculate a linear model based on observed single inversions
 # and then predicted all possible inversions between a set of IS element positions.
 
-# These calculations should NOT be run directly, but called from the wrapper 
+# These calculations should NOT be run directly, but called from the wrapper
 # 'inverts.predict.pl'.
 
 # Additional functions at the bottom are included for drawing the accompanying plots
@@ -14,13 +14,13 @@ library(ggplot2)
 library(scales)
 
 option_list = list(
-  make_option(c("-r", "--ref"), type="character", default=NULL, 
+  make_option(c("-r", "--ref"), type="character", default=NULL,
               help="set of observed single inversions", metavar="character"),
-  make_option(c("-f", "--file"), type="character", default=NULL, 
+  make_option(c("-f", "--file"), type="character", default=NULL,
               help="relative positions of IS481", metavar="character"),
-  make_option(c("-o", "--out"), type="character", default="pred-out.txt", 
+  make_option(c("-o", "--out"), type="character", default="pred-out.txt",
               help="output file name [default= %default]", metavar="character")
-); 
+);
 opt_parser = OptionParser(option_list=option_list);
 opt = parse_args(opt_parser)
 
@@ -31,14 +31,16 @@ if (is.null(opt$ref) | is.null(opt$file)){
 
 ## For testing:
 # opt$ref = ("/home/yrh8/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/20180614-Bp-check-gap1500-cat.NR.invertALL.txt")
-# opt$ref = ("/home/yrh8/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/invert-predict/Bsp-combined-20180719.inverts.txt")
 # opt$file = ("/home/yrh8/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/invert-predict/tmp-centers.txt")
+# opt$ref = ("/home/yrh8/Documents/Bordetella_species/results/mauve/Bsp-combined-20190903/Bsp-combined-20190903.1inverts-noBpp.txt")
+# opt$file = ("/home/yrh8/Documents/Bordetella_species/results/mauve/Bsp-combined-20190903/predict/Bp_J549.tmp")
 
 ### Set of observed single inversions for model building ###
 refs.df <- read.table(opt$ref,header=F,sep="\t")
 refs.symmetric = subset(refs.df, V11 == "ori" | V11 == "term")
 ratio = log(as.numeric(as.character(refs.symmetric$V9))/as.numeric(as.character(refs.symmetric$V10)))
 refs.ratio = cbind(refs.symmetric, ratio)
+nrow(refs.df)
 
 # duplicate ratios and invert #
 refs.invert = cbind(refs.ratio[1:8],refs.ratio[c("V10","V9","V11","V12")], lapply(refs.ratio[c("ratio")], function(x) x*-1))
@@ -46,19 +48,28 @@ colnames(refs.invert)[9] = "V9"
 colnames(refs.invert)[10] = "V10"
 refs.double = rbind.data.frame(refs.ratio, refs.invert)
 rownames(refs.double) <- 1:nrow(refs.double)
-
+nrow(refs.double)
 
 # remove outliers based on Left:Right ratio
 refs.passed = refs.double[!refs.double$ratio %in% boxplot.stats(refs.double$ratio)$out,]
-
+nrow(refs.passed)
 double.lens = refs.passed[,c('V9','V10')]
 double.lens[] <- lapply(double.lens, function(x) {
   if(is.factor(x)) as.numeric(as.character(x)) else x
 })
 
+# bp.passed = subset(refs.passed, V12 == 'Bp')
+# bp.lens = bp.passed[,c('V9','V10')]
+# bp.lens[] <- lapply(bp.lens, function(x) {
+#   if(is.factor(x)) as.numeric(as.character(x)) else x
+# })
+
 # linear regression
 sym.lm2 = lm( V10 ~ V9 - 1, data=double.lens)
-#summary(sym.lm2)
+summary(sym.lm2)
+
+# sym.lm4 = lm (V10 ~ V9 - 1, data=bp.lens)
+# summary(sym.lm4)
 
 
 ### Predict boundaries from new coordinates ###
@@ -73,19 +84,20 @@ write.table(IS481.df, file=opt$out,quote=F,sep="\t",row.names=F,col.names=F)
 
 
 ### plotting ###
-#calculate prediction interval boundaries
+#calculate prediction interval boundaries. RUN ONLY WITHIN RSTUDIO
 
 # new.test = data.frame(V9 = double.lens$V9)
 # new.pred = predict(sym.lm2, newdata = new.test, interval="pred",level=0.95)
 # new.df = cbind(new.test, new.pred)
 # head(new.df)
-# 
-# wtf.matches = ("/home/yrh8/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/invert-predict/J549-IS481-inverts-20180719.txt")
+
+#wtf.matches = ("/home/yrh8/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/invert-predict/J549-IS481-inverts-20180719.txt")
+# wtf.matches = ("/home/yrh8/Documents/Bordetella_species/results/mauve/Bsp-combined-20190903/predict/Bp_J549_IScollapsed-ISall.20190911.txt")
 # wtf.df <- read.table(wtf.matches,header=F,sep="\t")
 # sapply(wtf.df, class)
 # head(wtf.df)
 # break1 = c(0, 250,500,750,1000,1250,1500)
-# 
+#
 # (ggplot()
 #   + geom_point(data=wtf.df, mapping=aes(x=V10/1000,y=V11/1000), size =1, color="gray", alpha=0.7,stroke=0)
 #   + geom_smooth(method=lm, data=double.lens,aes(x=V9/1000, y=V10/1000), formula = y ~ x - 1, fullrange=T)
@@ -94,11 +106,11 @@ write.table(IS481.df, file=opt$out,quote=F,sep="\t",row.names=F,col.names=F)
 #                    y=(as.numeric(as.character(V10))/1000),
 #                    color=V11),
 #                size=2.4, alpha=0.6, shape=19,stroke=0)
-#   + geom_point(data=subset(refs.symmetric, V12 == 'Bpp'),
-#                aes(x=(as.numeric(as.character(V9))/1000),
-#                    y=(as.numeric(as.character(V10))/1000),
-#                    color=V11),
-#                size=2.4, alpha=0.6, shape=15,stroke=0)
+#   # + geom_point(data=subset(refs.symmetric, V12 == 'Bpp'),
+#   #              aes(x=(as.numeric(as.character(V9))/1000),
+#   #                  y=(as.numeric(as.character(V10))/1000),
+#   #                  color=V11),
+#   #              size=2.4, alpha=0.6, shape=15,stroke=0)
 #   + geom_point(data=subset(refs.symmetric, V12 == 'Bho'),
 #                aes(x=(as.numeric(as.character(V9))/1000),
 #                    y=(as.numeric(as.character(V10))/1000),
@@ -108,10 +120,10 @@ write.table(IS481.df, file=opt$out,quote=F,sep="\t",row.names=F,col.names=F)
 #                aes(x=(as.numeric(as.character(V9))/1000),
 #                    y=(as.numeric(as.character(V10))/1000),color=V11),
 #                size=2.2, shape=1 ,stroke=1)
-#   + geom_point(data=subset(refs.passed, V12 == 'Bpp'),
-#                aes(x=(as.numeric(as.character(V9))/1000),
-#                    y=(as.numeric(as.character(V10))/1000),color=V11),
-#                size=2.2, shape=0 ,stroke=1)
+#   # + geom_point(data=subset(refs.passed, V12 == 'Bpp'),
+#   #              aes(x=(as.numeric(as.character(V9))/1000),
+#   #                  y=(as.numeric(as.character(V10))/1000),color=V11),
+#   #              size=2.2, shape=0 ,stroke=1)
 #   + geom_point(data=subset(refs.passed, V12 == 'Bho'),
 #                aes(x=(as.numeric(as.character(V9))/1000),
 #                    y=(as.numeric(as.character(V10))/1000),color=V11),
@@ -128,12 +140,12 @@ write.table(IS481.df, file=opt$out,quote=F,sep="\t",row.names=F,col.names=F)
 #   + geom_line(data = new.df, mapping = aes(x=V9/1000, y=lwr/1000),color="red",linetype='dashed')
 #   + geom_line(data = new.df, mapping = aes(x=V9/1000, y=upr/1000),color="red",linetype='dashed')
 #   #+ coord_fixed(ratio=1)
-# 
-# )
-# 
-# 
-#  ggsave("/home/yrh8/Documents/Bordetella_species/results/mauve/20180221-Bp/04.colinear-mcl/invert-predict/Bsp-combined-model-20180803.pdf", device = 'pdf', width = 6, height = 6, units = 'in', useDingbats=F)
-# 
+
+)
+#
+#
+  # ggsave("/home/yrh8/Documents/Bordetella_species/results/mauve/Bsp-combined-20190903/predict/Bsp-combined-model-20190911.pdf", device = 'pdf', width = 6, height = 6, units = 'in', useDingbats=F)
+#
 # (ggplot( data = refs.ratio, aes(y=V7/1000,x=V11,color=V11)) #inverstion size
 #   + geom_jitter(width = 0.2, size=0.75) #, color="red")
 #   + geom_boxplot(outlier.size = 2, outlier.stroke = 0, alpha=0)
@@ -141,7 +153,7 @@ write.table(IS481.df, file=opt$out,quote=F,sep="\t",row.names=F,col.names=F)
 #   #+ geom_histogram(binwidth=100, alpha=0.4, position='dodge')
 #   + theme_minimal()
 # )
-# 
+#
 # (ggplot( data = refs.double, aes(x=ratio,color=V11, fill=V11))
 #   + geom_density(alpha=0.1)
 #   #+ geom_histogram(binwidth = 0.2, alpha =0.4)
@@ -150,4 +162,4 @@ write.table(IS481.df, file=opt$out,quote=F,sep="\t",row.names=F,col.names=F)
 #   + xlim(0,3)
 #   + labs( x = "Log ratio")
 # )
-# 
+#

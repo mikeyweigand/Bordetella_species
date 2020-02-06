@@ -80,6 +80,6 @@ sub HELP_MESSAGE { die "
 	 -log			Return natural log of ratio.
 
    [dependencies]
-
+	 blastn			(Must be in your \$PATH)
 
 " }

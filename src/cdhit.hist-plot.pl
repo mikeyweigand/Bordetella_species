@@ -86,12 +86,12 @@ if($densplot){
 	$R->run( qq' axis(side=1, at=ttt, tck=-0.02) ' );
 	$R->run( qq' dev.off() ' );
 }
-#> qplot( V2, data = cdhit, geom = "density" , fill=V1, alpha=.2,adjust=0.05) + scale_x_continuous(breaks=seq(0,100,5),limits=c(2,70)) + coord_cartesian(ylim=c(0,1))
+
 
 
 sub HELP_MESSAGE { die "
 .Description:
-   Takes set of cdhit cluster distribution files from plot_len.pl and draws a simple plot.
+   Takes set of cdhit cluster distribution files from cdhit.plot_len.pl and draws a simple plot.
 
 .Usage: $0 -in [in.txt] -out [out.png]
 
@@ -104,6 +104,6 @@ sub HELP_MESSAGE { die "
 
 
    [dependencies]
-	 R (ggplot2)
+	 R (Statistics::R, ggplot2)
 
 " }

@@ -13,6 +13,16 @@ use File::Basename;
 		);		#
 ($infile and $query and $inverts and $out and $temp) or &HELP_MESSAGE;
 
+my$srcdir = dirname($0);
+unless( -x "$srcdir/inverts.pred.R" ){
+	print "\nERROR: Cannot find '$srcdir/inverts.pred.R'\n";
+	&HELP_MESSAGE;
+}
+unless( -x "$srcdir/FastA.length.pl" ){
+	print "\nERROR: Cannot find '$srcdir/FastA.length.pl'\n";
+	&HELP_MESSAGE;
+}
+
 my$seqlen = qx( FastA.length.pl $infile | cut -f2);
 chomp$seqlen;
 my$term = &FIND_TERM( $infile );
@@ -22,7 +32,6 @@ if($oric){
 	$ori = &FIND_ORIC( $oric, $infile );
 }
 #print join("\t",($term,$ori,$seqlen))."\n";
-
 
 #find blastn hits for query in subject and find shortest dist to ori/term
 my$bls = &BLASTN( $query, $infile );
@@ -41,7 +50,6 @@ foreach my$s1 (@blastout){
 	@{$bls_hits{ $center }} = (@bls2,@inv);
 	push(@centers,$center);
 	#print join("__",(@bls2,$center))."\t".join("__", @inv)."\n";
-
 }
 
 # temp file for RScript
@@ -51,15 +59,14 @@ foreach my$pos (@centers){
 	splice(@short,2,1); #removes qseqid
 	#print TEMP $pos."\t". join("\t",(  @{$bls_hits{$pos}} ))."\n";
 	print TEMP $pos."\t". join("\t",( @short ))."\n";
-
 }
 close TEMP;
 
 # linear regression of observed inverts and predict new boundaries
 my$temp2 = $temp;
 $temp2 =~ s/\.txt$/\-pred.txt/;
-system( qq( Rscript /home/yrh8/Documents/Bordetella_species/src/inverts.pred.R -r $inverts -f $temp -o $temp2 ) );
-
+#system( qq( Rscript /home/yrh8/Documents/Bordetella_species/src/inverts.pred.R -r $inverts -f $temp -o $temp2 ) );
+system( qq( Rscript $srcdir/inverts.pred.R -r $inverts -f $temp -o $temp2 ) );
 
 # search new boundary predictions for matching blastn hits
 open PRED, "$temp2";
@@ -69,11 +76,9 @@ my$count = 0;
 while(my$p = <PRED>){
 	chomp$p;
 	my@sp = split("\t",$p);
-
 	my@window = &WINDOW( \@sp, $term, $seqlen, $ori );
 	my@pred=();
 	@pred = &MATCHER( \@sp, \@centers, \@window, \%bls_hits);
-
 	#print $sp[0]."\t".scalar(@pred)."\n";
 
 	foreach my$j (@pred){
@@ -93,8 +98,6 @@ while(my$p = <PRED>){
 	}
 }
 print "\n\tFound $count possible inversions between BLASTn hits of '".basename($query)."' in '".basename($infile)."'\n\n";
-
-
 
 ######################################
 
@@ -222,6 +225,8 @@ sub HELP_MESSAGE { die "
 .Description:
    Predict all possible symmetric inversions in given genome based on table of observed inversions.
 
+   NOTE: the Bordetella dif sequence is hard-coded into this script and may not be suitable for other organism: 'aattcgcataatgtatattatgtaaagt'
+
 .Usage: $0 -fasta [in.fasta] -query [query.fasta] -inverts [inv.txt] -out [out.txt] -temp [temp.txt]
 
    [mandatory]
@@ -235,6 +240,10 @@ sub HELP_MESSAGE { die "
 	 -oric		<ori.fasta>	Fasta file of known OriC to find coordinates, otherwise use 1.
 
    [dependencies]
-	 inverts.pred.R
+	 R			(Statistics::R)
+	 inverts.pred.R		(Must be in the same directory as this script)
+	 FastA.length.pl	(http://enve-omics.ce.gatech.edu/enveomics/. Must be in your \$PATH)
+	 blastn			(Must be in your \$PATH)
+
 
 " }

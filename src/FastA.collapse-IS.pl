@@ -170,4 +170,5 @@ sub HELP_MESSAGE { die "
 
    [dependencies]
 	 BioPerl	(Bio::SeqIO)
+	 blastn		(Must be in your \$PATH)
 " }
